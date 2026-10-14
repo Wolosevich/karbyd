@@ -106,12 +106,17 @@ export default function PostCard({ post }: { post: Post }) {
           {post._count?.likes ?? 0}
         </Text>
 
-        <Group gap="xs">
-          <IconMessageCircle size={20} color="gray" />
-          <Text size="sm" c="dimmed">
-            {post._count?.comments ?? 0}
-          </Text>
-        </Group>
+        <Link
+          to={`/post/${post.id}`}
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
+          <Group gap="xs" style={{ cursor: "pointer" }}>
+            <IconMessageCircle size={20} color="gray" />
+            <Text size="sm" c="dimmed">
+              {post._count?.comments ?? 0}
+            </Text>
+          </Group>
+        </Link>
       </Group>
     </Paper>
   );
