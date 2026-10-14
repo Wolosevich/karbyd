@@ -1,11 +1,12 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { Center, Loader, AppShell } from '@mantine/core';
-import Login from './pages/Login';
-import Feed from './pages/Feed';
-import Profile from './pages/Profile';
-import Navbar from './components/Navbar';
-import { useAuth } from './hooks/useAuth';
-import PostDetail from './pages/PostDetail';
+import { Routes, Route, Navigate } from "react-router-dom";
+import { Center, Loader, AppShell } from "@mantine/core";
+import Login from "./pages/Login";
+import Feed from "./pages/Feed";
+import Profile from "./pages/Profile";
+import Navbar from "./components/Navbar";
+import { useAuth } from "./hooks/useAuth";
+import PostDetail from "./pages/PostDetail";
+import Search from "./pages/Search";
 
 function App() {
   const { user, isLoading } = useAuth();
@@ -35,6 +36,7 @@ function App() {
       <AppShell.Main>
         <Routes>
           <Route path="/" element={<Feed />} />
+          <Route path="/search" element={<Search />} />
           <Route path="/post/:id" element={<PostDetail />} />
           <Route path="/profile/:username" element={<Profile />} />
           <Route path="*" element={<Navigate to="/" />} />

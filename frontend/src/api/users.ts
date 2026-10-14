@@ -9,4 +9,9 @@ export const usersApi = {
 
   updateMe: (data: { bio?: string; avatar?: string }) =>
     api.patch<User>("/users/me", data).then((res) => res.data),
+
+  search: (q: string) =>
+    api
+      .get<{ items: User[] }>("/users/search", { params: { q } })
+      .then((res) => res.data),
 };
