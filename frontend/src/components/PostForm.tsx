@@ -1,4 +1,12 @@
-import { Textarea, TextInput, Button, Paper, Group, Text } from "@mantine/core";
+import {
+  Textarea,
+  TextInput,
+  Button,
+  Paper,
+  Group,
+  Text,
+  Image,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useCreatePost } from "../hooks/usePosts";
@@ -60,6 +68,16 @@ export default function PostForm() {
           mt="sm"
           {...form.getInputProps("image")}
         />
+        {form.values.image && !form.errors.image && (
+          <Image
+            src={form.values.image}
+            mt="sm"
+            radius="md"
+            fit="cover"
+            mah={300}
+            alt="Превью"
+          />
+        )}
 
         <Group justify="space-between" mt="sm">
           <Text size="xs" c="dimmed">
