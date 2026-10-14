@@ -55,36 +55,39 @@ export default function PostCard({ post }: { post: Post }) {
             >
               {post.author.username}
             </Text>
-            <Text
-              component={Link}
-              to={`/post/${post.id}`}
-              size="xs"
-              c="dimmed"
-              style={{ textDecoration: "none" }}
-            >
-              {formatDate(post.createdAt)}
-            </Text>
           </div>
         </Group>
 
-        {isOwner && (
-          <Menu shadow="md" width={160}>
-            <Menu.Target>
-              <ActionIcon variant="subtle" color="gray">
-                ⋯
-              </ActionIcon>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item
-                color="red"
-                leftSection={<IconTrash size={16} />}
-                onClick={() => deletePost.mutate(post.id)}
-              >
-                Удалить
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        )}
+        <Group gap="xs">
+          <Text
+            component={Link}
+            to={`/post/${post.id}`}
+            size="xs"
+            c="dimmed"
+            style={{ textDecoration: "none" }}
+          >
+            {formatDate(post.createdAt)}
+          </Text>
+
+          {isOwner && (
+            <Menu shadow="md" width={160}>
+              <Menu.Target>
+                <ActionIcon variant="subtle" color="gray">
+                  ⋯
+                </ActionIcon>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  color="red"
+                  leftSection={<IconTrash size={16} />}
+                  onClick={() => deletePost.mutate(post.id)}
+                >
+                  Удалить
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          )}
+        </Group>
       </Group>
 
       <Text style={{ whiteSpace: "pre-wrap" }}>
