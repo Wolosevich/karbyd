@@ -6,6 +6,8 @@ import authPlugin from "./plugins/auth.js";
 import { authRoutes } from "./routes/auth.js";
 import { postRoutes } from "./routes/posts.js";
 import { userRoutes } from "./routes/users.js";
+import multipart from "@fastify/multipart";
+import { uploadRoutes } from "./routes/upload.js";
 
 const app = Fastify({ logger: true });
 
@@ -19,6 +21,10 @@ const start = async () => {
 
     await app.register(cookie);
 
+    await app.register(multipart, {
+      limits: { fileSize: 5 * 1024 * 1024 },
+    });
+
     await app.register(authPlugin);
 
     await app.register(authRoutes, { prefix: "/api/auth" });
@@ -26,6 +32,8 @@ const start = async () => {
     await app.register(postRoutes, { prefix: "/api/posts" });
 
     await app.register(userRoutes, { prefix: "/api/users" });
+
+    await app.register(uploadRoutes, { prefix: "/api" });
 
     app.get("/", async () => ({ message: "Привет от karbyd API!" }));
 

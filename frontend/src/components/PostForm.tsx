@@ -1,21 +1,28 @@
+import { useState } from "react";
 import {
   Textarea,
-  TextInput,
   Button,
   Paper,
   Group,
   Text,
   Image,
+  FileButton,
+  ActionIcon,
+  Loader,
 } from "@mantine/core";
+import { IconPhoto, IconX } from "@tabler/icons-react";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useCreatePost } from "../hooks/usePosts";
+import { useUpload } from "../hooks/useUpload";
 
 export default function PostForm() {
   const createPost = useCreatePost();
+  const { uploadImage, isUploading } = useUpload();
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const form = useForm({
-    initialValues: { text: "", image: "" },
+    initialValues: { text: "" },
     validate: {
       text: (v) =>
         v.trim().length === 0
@@ -23,25 +30,29 @@ export default function PostForm() {
           : v.length > 1000
             ? "Максимум 1000 символов"
             : null,
-      image: (v) => {
-        if (!v) return null;
-        try {
-          new URL(v);
-          return null;
-        } catch {
-          return "Некорректная ссылка на картинку";
-        }
-      },
     },
   });
+
+  const handleFileSelect = async (file: File | null) => {
+    if (!file) return;
+    const url = await uploadImage(file);
+    if (url) {
+      setImageUrl(url);
+      notifications.show({
+        message: "Картинка загружена!",
+        color: "green",
+      });
+    }
+  };
 
   const handleSubmit = form.onSubmit(async (values) => {
     try {
       await createPost.mutateAsync({
         text: values.text.trim(),
-        image: values.image.trim() || undefined,
+        image: imageUrl || undefined,
       });
       form.reset();
+      setImageUrl(null);
       notifications.show({ message: "Пост опубликован!", color: "green" });
     } catch {
       notifications.show({
@@ -51,6 +62,8 @@ export default function PostForm() {
       });
     }
   });
+
+  const isLoading = createPost.isPending || isUploading;
 
   return (
     <Paper withBorder p="md" radius="md">
@@ -63,27 +76,52 @@ export default function PostForm() {
           {...form.getInputProps("text")}
         />
 
-        <TextInput
-          placeholder="URL картинки (необязательно)"
-          mt="sm"
-          {...form.getInputProps("image")}
-        />
-        {form.values.image && !form.errors.image && (
-          <Image
-            src={form.values.image}
-            mt="sm"
-            radius="md"
-            fit="cover"
-            mah={300}
-            alt="Превью"
-          />
+        {imageUrl && (
+          <div style={{ position: "relative", marginTop: 12 }}>
+            <Image src={imageUrl} radius="md" fit="cover" mah={300} alt="" />
+            <ActionIcon
+              variant="filled"
+              color="red"
+              size="sm"
+              style={{ position: "absolute", top: 8, right: 8 }}
+              onClick={() => setImageUrl(null)}
+            >
+              <IconX size={14} />
+            </ActionIcon>
+          </div>
         )}
 
         <Group justify="space-between" mt="sm">
-          <Text size="xs" c="dimmed">
-            {form.values.text.length} / 1000
-          </Text>
-          <Button type="submit" loading={createPost.isPending}>
+          <Group gap="xs">
+            <FileButton
+              onChange={handleFileSelect}
+              accept="image/png,image/jpeg,image/webp,image/gif"
+            >
+              {(props) => (
+                <Button
+                  {...props}
+                  variant="subtle"
+                  size="sm"
+                  leftSection={
+                    isUploading ? <Loader size={14} /> : <IconPhoto size={16} />
+                  }
+                  disabled={isUploading}
+                >
+                  {isUploading ? "Загрузка..." : "Картинка"}
+                </Button>
+              )}
+            </FileButton>
+
+            <Text size="xs" c="dimmed">
+              {form.values.text.length} / 1000
+            </Text>
+          </Group>
+
+          <Button
+            type="submit"
+            loading={createPost.isPending}
+            disabled={isLoading}
+          >
             Опубликовать
           </Button>
         </Group>
