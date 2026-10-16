@@ -4,31 +4,6 @@ import { updateProfileSchema } from "../schemas/user.js";
 
 export async function userRoutes(app: FastifyInstance) {
   // PATCH /api/users/me — обновить свой профиль
-  // ⚠️ Должен быть ВЫШЕ /:username, иначе Fastify перехватит "me" как username
-  // GET /api/users/search?q=... — поиск пользователей
-  app.get("/search", async (req) => {
-    const { q } = req.query as { q?: string };
-
-    if (!q || q.trim().length === 0) {
-      return { items: [] };
-    }
-
-    const users = await prisma.user.findMany({
-      where: {
-        username: { contains: q, mode: "insensitive" },
-      },
-      take: 20,
-      select: {
-        id: true,
-        username: true,
-        avatar: true,
-        bio: true,
-      },
-      orderBy: { username: "asc" },
-    });
-
-    return { items: users };
-  });
   app.patch("/me", { preHandler: [app.authenticate] }, async (req, reply) => {
     const parsed = updateProfileSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -58,9 +33,42 @@ export async function userRoutes(app: FastifyInstance) {
     return updated;
   });
 
-  // GET /api/users/:username — профиль пользователя + его посты
+  // GET /api/users/search?q=... — поиск пользователей
+  app.get("/search", async (req) => {
+    const { q } = req.query as { q?: string };
+
+    if (!q || q.trim().length === 0) {
+      return { items: [] };
+    }
+
+    const users = await prisma.user.findMany({
+      where: {
+        username: { contains: q, mode: "insensitive" },
+      },
+      take: 20,
+      select: {
+        id: true,
+        username: true,
+        avatar: true,
+        bio: true,
+      },
+      orderBy: { username: "asc" },
+    });
+
+    return { items: users };
+  });
+
+  // GET /api/users/:username — профиль + посты + подписки
   app.get("/:username", async (req, reply) => {
     const { username } = req.params as { username: string };
+
+    let currentUserId: string | null = null;
+    try {
+      await req.jwtVerify();
+      currentUserId = req.user.userId;
+    } catch {
+      // не залогинен — isFollowing будет false
+    }
 
     const user = await prisma.user.findUnique({
       where: { username },
@@ -77,15 +85,40 @@ export async function userRoutes(app: FastifyInstance) {
       return reply.code(404).send({ error: "Пользователь не найден" });
     }
 
-    const posts = await prisma.post.findMany({
-      where: { authorId: user.id },
-      orderBy: { createdAt: "desc" },
-      include: {
-        author: { select: { id: true, username: true, avatar: true } },
-        _count: { select: { likes: true, comments: true } },
-      },
-    });
+    const [posts, followersCount, followingCount, isFollowing] =
+      await Promise.all([
+        prisma.post.findMany({
+          where: { authorId: user.id },
+          orderBy: { createdAt: "desc" },
+          include: {
+            author: { select: { id: true, username: true, avatar: true } },
+            _count: { select: { likes: true, comments: true } },
+          },
+        }),
+        prisma.follow.count({ where: { followingId: user.id } }),
+        prisma.follow.count({ where: { followerId: user.id } }),
+        currentUserId
+          ? prisma.follow.findUnique({
+              where: {
+                followerId_followingId: {
+                  followerId: currentUserId,
+                  followingId: user.id,
+                },
+              },
+            })
+          : null,
+      ]);
 
-    return { user, posts };
+    return {
+      user: {
+        ...user,
+        _count: {
+          followers: followersCount,
+          following: followingCount,
+        },
+      },
+      posts,
+      isFollowing: !!isFollowing,
+    };
   });
 }

@@ -4,7 +4,11 @@ import type { Post, User } from "../types";
 export const usersApi = {
   getByUsername: (username: string) =>
     api
-      .get<{ user: User; posts: Post[] }>(`/users/${username}`)
+      .get<{
+        user: User;
+        posts: Post[];
+        isFollowing: boolean;
+      }>(`/users/${username}`)
       .then((res) => res.data),
 
   updateMe: (data: { bio?: string; avatar?: string }) =>
@@ -13,5 +17,10 @@ export const usersApi = {
   search: (q: string) =>
     api
       .get<{ items: User[] }>("/users/search", { params: { q } })
+      .then((res) => res.data),
+
+  toggleFollow: (username: string) =>
+    api
+      .post<{ following: boolean }>(`/users/${username}/follow`)
       .then((res) => res.data),
 };

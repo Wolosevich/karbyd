@@ -6,10 +6,10 @@ import {
 } from "@tanstack/react-query";
 import { postsApi } from "../api/posts";
 
-export function useFeed() {
+export function useFeed(feed: "all" | "following" = "all") {
   return useInfiniteQuery({
-    queryKey: ["feed"],
-    queryFn: ({ pageParam }) => postsApi.feed(pageParam),
+    queryKey: ["feed", feed],
+    queryFn: ({ pageParam }) => postsApi.feed(pageParam, feed),
     initialPageParam: null as string | null,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
   });

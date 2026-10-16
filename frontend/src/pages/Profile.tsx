@@ -13,17 +13,25 @@ import {
   Divider,
   Button,
 } from "@mantine/core";
-import { IconInfoCircle, IconEdit } from "@tabler/icons-react";
+import {
+  IconInfoCircle,
+  IconEdit,
+  IconUserPlus,
+  IconUserMinus,
+} from "@tabler/icons-react";
 import PostCard from "../components/PostCard";
 import EditProfileModal from "../components/EditProfileModal";
 import { useProfile } from "../hooks/useProfile";
 import { useAuth } from "../hooks/useAuth";
+import { useToggleFollow } from "../hooks/useFollow";
 
 export default function Profile() {
   const { username } = useParams<{ username: string }>();
   const { data, isLoading, isError } = useProfile(username || "");
   const { user: currentUser } = useAuth();
   const [editOpened, setEditOpened] = useState(false);
+
+  const toggleFollow = useToggleFollow(username || "");
 
   if (isLoading) {
     return (
@@ -43,7 +51,7 @@ export default function Profile() {
     );
   }
 
-  const { user, posts } = data;
+  const { user, posts, isFollowing } = data;
   const isOwnProfile = currentUser?.username === user.username;
 
   return (
@@ -61,19 +69,43 @@ export default function Profile() {
                   {user.bio}
                 </Text>
               )}
-              <Text c="dimmed" size="xs" mt={4}>
-                {posts.length} {posts.length === 1 ? "пост" : "постов"}
-              </Text>
+              <Group gap="md" mt={4}>
+                <Text c="dimmed" size="xs">
+                  <strong>{posts.length}</strong>{" "}
+                  {posts.length === 1 ? "пост" : "постов"}
+                </Text>
+                <Text c="dimmed" size="xs">
+                  <strong>{user._count?.followers ?? 0}</strong> подписчиков
+                </Text>
+                <Text c="dimmed" size="xs">
+                  <strong>{user._count?.following ?? 0}</strong> подписок
+                </Text>
+              </Group>
             </div>
           </Group>
 
-          {isOwnProfile && (
+          {isOwnProfile ? (
             <Button
               variant="default"
               leftSection={<IconEdit size={16} />}
               onClick={() => setEditOpened(true)}
             >
               Редактировать
+            </Button>
+          ) : (
+            <Button
+              variant={isFollowing ? "default" : "filled"}
+              leftSection={
+                isFollowing ? (
+                  <IconUserMinus size={16} />
+                ) : (
+                  <IconUserPlus size={16} />
+                )
+              }
+              onClick={() => toggleFollow.mutate()}
+              loading={toggleFollow.isPending}
+            >
+              {isFollowing ? "Отписаться" : "Подписаться"}
             </Button>
           )}
         </Group>
