@@ -51,6 +51,15 @@ export async function followRoutes(app: FastifyInstance) {
         },
       });
 
+      // Создаём уведомление о подписке
+      await prisma.notification.create({
+        data: {
+          userId: target.id,
+          actorId: userId,
+          type: "follow",
+        },
+      });
+
       return { following: true };
     },
   );

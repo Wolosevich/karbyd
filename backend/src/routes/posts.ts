@@ -145,6 +145,19 @@ export async function postRoutes(app: FastifyInstance) {
       }
 
       await prisma.like.create({ data: { userId, postId } });
+
+      // Создаём уведомление, если лайкнули чужой пост
+      if (post.authorId !== userId) {
+        await prisma.notification.create({
+          data: {
+            userId: post.authorId,
+            actorId: userId,
+            type: "like",
+            postId: postId,
+          },
+        });
+      }
+
       return { liked: true };
     },
   );
@@ -176,6 +189,18 @@ export async function postRoutes(app: FastifyInstance) {
           author: { select: { id: true, username: true, avatar: true } },
         },
       });
+
+      // Создаём уведомление, если прокомментировали чужой пост
+      if (post.authorId !== req.user.userId) {
+        await prisma.notification.create({
+          data: {
+            userId: post.authorId,
+            actorId: req.user.userId,
+            type: "comment",
+            postId: postId,
+          },
+        });
+      }
 
       return reply.code(201).send(comment);
     },

@@ -9,9 +9,14 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 import { useAuth } from "../hooks/useAuth";
+import { Indicator } from "@mantine/core"; // добавь Indicator в импорт из @mantine/core
+import { IconBell } from "@tabler/icons-react"; // добавь IconBell в импорт иконок
+import { useNotifications } from "../hooks/useNotifications"; // новый импорт
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const { data: notifData } = useNotifications();
+  const unreadCount = notifData?.unreadCount || 0;
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -86,7 +91,26 @@ export default function Navbar() {
             <IconUsers size={20} />
           </ActionIcon>
         </div>
-
+        {/* Колокольчик уведомлений */}
+        <Indicator
+          inline
+          label={unreadCount > 0 ? unreadCount : undefined}
+          size={16}
+          color="red"
+          offset={5}
+          disabled={unreadCount === 0}
+        >
+          <ActionIcon
+            component={Link}
+            to="/notifications"
+            variant="subtle"
+            color="gray"
+            size="lg"
+            aria-label="Уведомления"
+          >
+            <IconBell size={20} />
+          </ActionIcon>
+        </Indicator>
         {/* Аватарка с выпадающим меню */}
         <Menu shadow="md" width={200} position="bottom-end">
           <Menu.Target>
