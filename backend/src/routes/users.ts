@@ -3,6 +3,32 @@ import { prisma } from "../lib/prisma.js";
 import { updateProfileSchema } from "../schemas/user.js";
 
 export async function userRoutes(app: FastifyInstance) {
+  // GET /api/users — список всех пользователей
+  app.get("/", async (req) => {
+    const query = req.query as { limit?: string };
+    const limit = Math.min(Number(query.limit) || 50, 100);
+
+    const users = await prisma.user.findMany({
+      take: limit,
+      select: {
+        id: true,
+        username: true,
+        avatar: true,
+        bio: true,
+        createdAt: true,
+        _count: {
+          select: {
+            posts: true,
+            followers: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return { items: users };
+  });
+
   // PATCH /api/users/me — обновить свой профиль
   app.patch("/me", { preHandler: [app.authenticate] }, async (req, reply) => {
     const parsed = updateProfileSchema.safeParse(req.body);

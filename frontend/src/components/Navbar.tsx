@@ -5,6 +5,7 @@ import {
   IconUser,
   IconHome,
   IconSearch,
+  IconUsers,
 } from "@tabler/icons-react";
 import { useAuth } from "../hooks/useAuth";
 
@@ -50,6 +51,15 @@ export default function Navbar() {
             leftSection={<IconSearch size={16} />}
           >
             Поиск
+          </Button>
+
+          <Button
+            component={Link}
+            to="/users"
+            variant="subtle"
+            leftSection={<IconUsers size={16} />}
+          >
+            Люди
           </Button>
 
           <Menu shadow="md" width={200}>

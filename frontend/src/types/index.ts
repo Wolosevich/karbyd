@@ -6,6 +6,7 @@ export interface User {
   bio?: string | null;
   createdAt?: string;
   _count?: {
+    posts?: number;
     followers: number;
     following: number;
   };

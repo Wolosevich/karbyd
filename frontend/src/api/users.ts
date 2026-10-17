@@ -2,6 +2,7 @@ import { api } from "./client";
 import type { Post, User } from "../types";
 
 export const usersApi = {
+  listAll: () => api.get<{ items: User[] }>("/users").then((res) => res.data),
   getByUsername: (username: string) =>
     api
       .get<{

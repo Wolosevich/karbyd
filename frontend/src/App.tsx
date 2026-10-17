@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar";
 import { useAuth } from "./hooks/useAuth";
 import PostDetail from "./pages/PostDetail";
 import Search from "./pages/Search";
+import Users from "./pages/Users";
 
 function App() {
   const { user, isLoading } = useAuth();
@@ -36,6 +37,7 @@ function App() {
       <AppShell.Main>
         <Routes>
           <Route path="/" element={<Feed />} />
+          <Route path="/users" element={<Users />} />
           <Route path="/search" element={<Search />} />
           <Route path="/post/:id" element={<PostDetail />} />
           <Route path="/profile/:username" element={<Profile />} />
