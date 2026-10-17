@@ -87,7 +87,7 @@ export default function PostDetail() {
             </div>
           </Group>
 
-          <Text style={{ whiteSpace: "pre-wrap" }}>
+          <Text style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
             {renderTextWithLinks(post.text)}
           </Text>
 
@@ -140,7 +140,10 @@ export default function PostDetail() {
                   </Text>
                 </div>
               </Group>
-              <Text size="sm" style={{ whiteSpace: "pre-wrap" }}>
+              <Text
+                size="sm"
+                style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+              >
                 {renderTextWithLinks(comment.text)}
               </Text>
             </Paper>

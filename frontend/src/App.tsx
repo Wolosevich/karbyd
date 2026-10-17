@@ -3,11 +3,11 @@ import { Center, Loader, AppShell } from "@mantine/core";
 import Login from "./pages/Login";
 import Feed from "./pages/Feed";
 import Profile from "./pages/Profile";
-import Navbar from "./components/Navbar";
-import { useAuth } from "./hooks/useAuth";
-import PostDetail from "./pages/PostDetail";
 import Search from "./pages/Search";
 import Users from "./pages/Users";
+import PostDetail from "./pages/PostDetail";
+import Navbar from "./components/Navbar";
+import { useAuth } from "./hooks/useAuth";
 
 function App() {
   const { user, isLoading } = useAuth();

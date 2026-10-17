@@ -1,0 +1,45 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.logo {
+  text-decoration: none;
+  color: var(--mantine-color-blue-5);
+  font-size: 1.5rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.rightSide {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.desktopOnly {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobileOnly {
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 48em) {
+  .desktopOnly {
+    display: none;
+  }
+  .mobileOnly {
+    display: flex;
+  }
+}

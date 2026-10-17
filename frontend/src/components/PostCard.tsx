@@ -90,7 +90,7 @@ export default function PostCard({ post }: { post: Post }) {
         </Group>
       </Group>
 
-      <Text style={{ whiteSpace: "pre-wrap" }}>
+      <Text style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
         {renderTextWithLinks(post.text)}
       </Text>
 
