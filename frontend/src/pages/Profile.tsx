@@ -21,6 +21,7 @@ import {
 } from "@tabler/icons-react";
 import PostCard from "../components/PostCard";
 import EditProfileModal from "../components/EditProfileModal";
+import SEO from "../components/SEO";
 import { useProfile } from "../hooks/useProfile";
 import { useAuth } from "../hooks/useAuth";
 import { useToggleFollow } from "../hooks/useFollow";
@@ -56,6 +57,15 @@ export default function Profile() {
 
   return (
     <Container size="sm" py="xl">
+      <SEO
+        title={`${user.username} — karbyd`}
+        description={
+          user.bio || `Профиль пользователя ${user.username} в karbyd`
+        }
+        url={`https://karbyd.vercel.app/profile/${user.username}`}
+        image={user.avatar || undefined}
+      />
+
       <Stack gap="md">
         <Group justify="space-between" align="flex-start">
           <Group>

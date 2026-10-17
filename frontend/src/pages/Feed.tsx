@@ -13,6 +13,7 @@ import {
   Group,
 } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
+import SEO from "../components/SEO";
 import PostForm from "../components/PostForm";
 import PostCard from "../components/PostCard";
 import { useFeed } from "../hooks/usePosts";
@@ -55,6 +56,7 @@ export default function Feed() {
 
   return (
     <Container size="sm" py="xl">
+      <SEO title="Лента — karbyd" />
       <Stack gap="md">
         <Title order={2}>Лента</Title>
 
