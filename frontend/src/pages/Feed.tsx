@@ -4,16 +4,41 @@ import {
   Stack,
   Title,
   Text,
-  Loader,
   Center,
   Alert,
   Button,
   SegmentedControl,
+  Skeleton,
+  Paper,
+  Group,
 } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
 import PostForm from "../components/PostForm";
 import PostCard from "../components/PostCard";
 import { useFeed } from "../hooks/usePosts";
+import ScrollToTop from "../components/ScrollToTop";
+
+// Компонент, который рисует серую карточку-заглушку
+function PostSkeleton() {
+  return (
+    <Paper withBorder p="md" radius="md">
+      <Group>
+        <Skeleton height={40} circle />
+        <div style={{ flex: 1 }}>
+          <Skeleton height={12} width="40%" radius="xl" />
+          <Skeleton height={8} width="20%" mt={8} radius="xl" />
+        </div>
+      </Group>
+      <Skeleton height={10} mt="md" radius="xl" />
+      <Skeleton height={10} mt={8} width="80%" radius="xl" />
+      <Skeleton height={200} mt="md" radius="md" />
+      <Group mt="md">
+        <Skeleton height={20} width={40} radius="xl" />
+        <Skeleton height={20} width={40} radius="xl" />
+      </Group>
+    </Paper>
+  );
+}
 
 export default function Feed() {
   const [feedType, setFeedType] = useState<"all" | "following">("all");
@@ -46,9 +71,11 @@ export default function Feed() {
         {feedType === "all" && <PostForm />}
 
         {isLoading && (
-          <Center py="xl">
-            <Loader />
-          </Center>
+          <Stack gap="md">
+            <PostSkeleton />
+            <PostSkeleton />
+            <PostSkeleton />
+          </Stack>
         )}
 
         {isError && (
@@ -103,6 +130,9 @@ export default function Feed() {
           </Text>
         )}
       </Stack>
+      {/* ...весь код... */}
+
+      <ScrollToTop />
     </Container>
   );
 }
