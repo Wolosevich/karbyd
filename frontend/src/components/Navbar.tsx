@@ -52,7 +52,7 @@ export default function Navbar() {
             variant="subtle"
             leftSection={<IconUsers size={16} />}
           >
-            Люди
+            Пользователи
           </Button>
         </div>
 

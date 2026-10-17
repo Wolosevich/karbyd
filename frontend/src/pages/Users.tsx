@@ -43,7 +43,7 @@ export default function Users() {
       <Stack gap="md">
         <Group gap="xs">
           <IconUsers size={24} />
-          <Title order={2}>Люди</Title>
+          <Title order={2}>Пользователи</Title>
           <Badge variant="light">{users.length}</Badge>
         </Group>
 
