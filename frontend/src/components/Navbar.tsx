@@ -33,7 +33,7 @@ export default function Navbar() {
         karbyd
       </Link>
 
-      <div className={classes.rightSide}>
+      <div className={classes.rightSide} style={{ gap: '8px' }}>
         {/* Кнопки для десктопа */}
         <div className={classes.desktopOnly}>
           <Button
@@ -72,27 +72,27 @@ export default function Navbar() {
             to="/"
             variant="subtle"
             color="gray"
-            size="lg"
+            size="md"
           >
-            <IconHome size={20} />
+            <IconHome size={18} />
           </ActionIcon>
           <ActionIcon
             component={Link}
             to="/search"
             variant="subtle"
             color="gray"
-            size="lg"
+            size="md"
           >
-            <IconSearch size={20} />
+            <IconSearch size={18} />
           </ActionIcon>
           <ActionIcon
             component={Link}
             to="/users"
             variant="subtle"
             color="gray"
-            size="lg"
+            size="md"
           >
-            <IconUsers size={20} />
+            <IconUsers size={18} />
           </ActionIcon>
           <ActionIcon component={Link} to="/dialogs" variant="subtle" color="gray" size="lg">
             <IconMessage size={20} />
@@ -112,16 +112,16 @@ export default function Navbar() {
             to="/notifications"
             variant="subtle"
             color="gray"
-            size="lg"
+            size="md"
             aria-label="Уведомления"
           >
-            <IconBell size={20} />
+            <IconBell size={18} />
           </ActionIcon>
         </Indicator>
         {/* Аватарка с выпадающим меню */}
         <Menu shadow="md" width={200} position="bottom-end">
           <Menu.Target>
-            <Avatar src={user.avatar} radius="xl" style={{ cursor: "pointer" }}>
+            <Avatar src={user.avatar} radius="xl" size="md" style={{ cursor: "pointer" }}>
               {user.username[0]?.toUpperCase() || "?"}
             </Avatar>
           </Menu.Target>
