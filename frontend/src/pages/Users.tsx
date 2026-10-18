@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 import {
   Container,
   Stack,
@@ -11,9 +11,9 @@ import {
   Center,
   Alert,
   Badge,
-} from "@mantine/core";
-import { IconInfoCircle, IconUsers } from "@tabler/icons-react";
-import { useAllUsers } from "../hooks/useAllUsers";
+} from '@mantine/core';
+import { IconInfoCircle, IconUsers } from '@tabler/icons-react';
+import { useAllUsers } from '../hooks/useAllUsers';
 
 export default function Users() {
   const { data, isLoading, isError } = useAllUsers();
@@ -64,38 +64,48 @@ export default function Users() {
               withBorder
               p="md"
               radius="md"
-              style={{ textDecoration: "none", color: "inherit" }}
+              // Жестко задаем ширину и блочный тип, чтобы карточка не растягивалась
+              style={{ textDecoration: 'none', color: 'inherit', display: 'block', width: '100%' }}
             >
-              <Group justify="space-between" wrap="nowrap">
-                <Group wrap="nowrap">
-                  <Avatar src={user.avatar} radius="xl" size="lg">
+              <Group justify="space-between" wrap="nowrap" gap="sm">
+                {/* Левая часть: Аватар и Имя */}
+                <Group wrap="nowrap" gap="sm" style={{ flex: 1, minWidth: 0 }}>
+                  <Avatar
+                    src={user.avatar}
+                    radius="xl"
+                    size="md"
+                    style={{ flexShrink: 0 }}
+                  >
                     {user.username[0].toUpperCase()}
                   </Avatar>
-                  <div>
-                    <Text fw={500}>{user.username}</Text>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <Text fw={500} size="sm" truncate>
+                      {user.username}
+                    </Text>
                     {user.bio && (
-                      <Text size="sm" c="dimmed" lineClamp={1}>
+                      <Text size="xs" c="dimmed" truncate>
                         {user.bio}
                       </Text>
                     )}
                   </div>
                 </Group>
 
-                <Group gap="md">
-                  <div style={{ textAlign: "center" }}>
+                {/* Правая часть: Счетчики */}
+                <Group gap="sm" wrap="nowrap" style={{ flexShrink: 0 }}>
+                  <div style={{ textAlign: 'center' }}>
                     <Text size="sm" fw={600}>
                       {user._count?.posts ?? 0}
                     </Text>
-                    <Text size="xs" c="dimmed">
+                    <Text size="10px" c="dimmed">
                       постов
                     </Text>
                   </div>
-                  <div style={{ textAlign: "center" }}>
+                  <div style={{ textAlign: 'center' }}>
                     <Text size="sm" fw={600}>
                       {user._count?.followers ?? 0}
                     </Text>
-                    <Text size="xs" c="dimmed">
-                      подписчиков
+                    <Text size="10px" c="dimmed">
+                      подп.
                     </Text>
                   </div>
                 </Group>

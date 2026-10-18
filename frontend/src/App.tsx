@@ -41,7 +41,7 @@ function App() {
       <AppShell.Header>
         <Navbar />
       </AppShell.Header>
-      <AppShell.Main>
+      <AppShell.Main style={{ overflowX: 'hidden' }}>
         <Routes>
           <Route path="/" element={<Feed />} />
           <Route path="/users" element={<Users />} />
