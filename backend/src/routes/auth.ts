@@ -88,8 +88,16 @@ export async function authRoutes(app: FastifyInstance) {
   });
 
   // POST /api/auth/logout — выход
-  app.post("/logout", async (_req, reply) => {
-    reply.clearCookie("token", { path: "/" }).send({ ok: true });
+  // POST /api/auth/logout — выход
+  app.post('/logout', async (_req, reply) => {
+    reply
+      .clearCookie('token', {
+        path: '/',
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: process.env.NODE_ENV === 'production',
+      })
+      .send({ ok: true });
   });
 
   // GET /api/auth/me — текущий пользователь
