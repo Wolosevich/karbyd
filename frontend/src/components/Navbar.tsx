@@ -66,38 +66,7 @@ export default function Navbar() {
         </div>
 
         {/* Иконки для мобилок */}
-        <div className={classes.mobileOnly}>
-          <ActionIcon
-            component={Link}
-            to="/"
-            variant="subtle"
-            color="gray"
-            size="md"
-          >
-            <IconHome size={18} />
-          </ActionIcon>
-          <ActionIcon
-            component={Link}
-            to="/search"
-            variant="subtle"
-            color="gray"
-            size="md"
-          >
-            <IconSearch size={18} />
-          </ActionIcon>
-          <ActionIcon
-            component={Link}
-            to="/users"
-            variant="subtle"
-            color="gray"
-            size="md"
-          >
-            <IconUsers size={18} />
-          </ActionIcon>
-          <ActionIcon component={Link} to="/dialogs" variant="subtle" color="gray" size="lg">
-            <IconMessage size={20} />
-          </ActionIcon>
-        </div>
+
         {/* Колокольчик уведомлений */}
         <Indicator
           inline

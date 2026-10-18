@@ -12,6 +12,7 @@ import Navbar from "./components/Navbar";
 import { useAuth } from "./hooks/useAuth";
 import Dialogs from './pages/Dialogs';
 import Chat from './pages/Chat';
+import MobileNavbar from './components/MobileNavbar';
 
 function App() {
   const { user, isLoading } = useAuth();
@@ -37,11 +38,12 @@ function App() {
 
   // Если ЗАЛОГИНЕН
   return (
+
     <AppShell header={{ height: 60 }} padding="md">
       <AppShell.Header>
         <Navbar />
       </AppShell.Header>
-      <AppShell.Main style={{ overflowX: 'hidden' }}>
+      <AppShell.Main style={{ paddingBottom: '80px' }}>
         <Routes>
           <Route path="/" element={<Feed />} />
           <Route path="/users" element={<Users />} />
@@ -51,13 +53,14 @@ function App() {
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/dialogs" element={<Dialogs />} />
           <Route path="/chat/:username" element={<Chat />} />
-          {/* Если залогиненный заходит на /login или /landing — кидаем на главную */}
           <Route path="/login" element={<Navigate to="/" />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
+        <MobileNavbar />
       </AppShell.Main>
     </AppShell>
   );
+
 }
 
 export default App;
