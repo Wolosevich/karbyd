@@ -7,6 +7,7 @@ import {
   IconHome,
   IconSearch,
   IconUsers,
+  IconMessage,
 } from "@tabler/icons-react";
 import { useAuth } from "../hooks/useAuth";
 import { Indicator } from "@mantine/core"; // добавь Indicator в импорт из @mantine/core
@@ -59,6 +60,9 @@ export default function Navbar() {
           >
             Пользователи
           </Button>
+          <Button component={Link} to="/dialogs" variant="subtle" leftSection={<IconMessage size={16} />}>
+            Сообщения
+          </Button>
         </div>
 
         {/* Иконки для мобилок */}
@@ -89,6 +93,9 @@ export default function Navbar() {
             size="lg"
           >
             <IconUsers size={20} />
+          </ActionIcon>
+          <ActionIcon component={Link} to="/dialogs" variant="subtle" color="gray" size="lg">
+            <IconMessage size={20} />
           </ActionIcon>
         </div>
         {/* Колокольчик уведомлений */}

@@ -10,6 +10,7 @@ import multipart from "@fastify/multipart";
 import { uploadRoutes } from "./routes/upload.js";
 import { followRoutes } from "./routes/follows.js";
 import { notificationRoutes } from "./routes/notifications.js";
+import { messageRoutes } from './routes/messages.js';
 
 const app = Fastify({ logger: true });
 
@@ -34,6 +35,8 @@ const start = async () => {
     await app.register(postRoutes, { prefix: "/api/posts" });
 
     await app.register(userRoutes, { prefix: "/api/users" });
+
+    await app.register(messageRoutes, { prefix: '/api/messages' });
 
     await app.register(notificationRoutes, { prefix: "/api/notifications" });
 

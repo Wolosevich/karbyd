@@ -40,3 +40,27 @@ export interface FeedResponse {
   items: Post[];
   nextCursor: string | null;
 }
+export interface Message {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  text: string;
+  read: boolean;
+  createdAt: string;
+  sender: Pick<User, 'id' | 'username' | 'avatar'>;
+}
+
+export interface Dialog {
+  user: Pick<User, 'id' | 'username' | 'avatar'>;
+  lastMessage: Message;
+  unreadCount: number;
+}
+
+export interface DialogsResponse {
+  items: Dialog[];
+}
+
+export interface ChatResponse {
+  user: Pick<User, 'id' | 'username' | 'avatar'>;
+  messages: Message[];
+}

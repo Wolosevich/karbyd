@@ -19,6 +19,8 @@ import {
   IconUserPlus,
   IconUserMinus,
 } from "@tabler/icons-react";
+import { Link } from 'react-router-dom';
+import { IconMessage } from '@tabler/icons-react';
 import PostCard from "../components/PostCard";
 import EditProfileModal from "../components/EditProfileModal";
 import SEO from "../components/SEO";
@@ -103,20 +105,26 @@ export default function Profile() {
               Редактировать
             </Button>
           ) : (
-            <Button
-              variant={isFollowing ? "default" : "filled"}
-              leftSection={
-                isFollowing ? (
-                  <IconUserMinus size={16} />
-                ) : (
-                  <IconUserPlus size={16} />
-                )
-              }
-              onClick={() => toggleFollow.mutate()}
-              loading={toggleFollow.isPending}
-            >
-              {isFollowing ? "Отписаться" : "Подписаться"}
-            </Button>
+            <Group>
+              <Button
+                component={Link}
+                to={`/chat/${user.username}`}
+                variant="default"
+                leftSection={<IconMessage size={16} />}
+              >
+                Написать
+              </Button>
+              <Button
+                variant={isFollowing ? 'default' : 'filled'}
+                leftSection={
+                  isFollowing ? <IconUserMinus size={16} /> : <IconUserPlus size={16} />
+                }
+                onClick={() => toggleFollow.mutate()}
+                loading={toggleFollow.isPending}
+              >
+                {isFollowing ? 'Отписаться' : 'Подписаться'}
+              </Button>
+            </Group>
           )}
         </Group>
 

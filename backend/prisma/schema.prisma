@@ -20,6 +20,8 @@ model User {
   followers Follow[]  @relation("following")
   notifications Notification[] @relation("user_notifications")
   triggeredNotifications Notification[] @relation("actor_notifications")
+  sentMessages           Message[]      @relation("sent_messages")
+  receivedMessages       Message[]      @relation("received_messages")
   createdAt DateTime  @default(now())
 }
 
@@ -89,4 +91,22 @@ model Notification {
   createdAt DateTime @default(now())
 
   @@index([userId, read])
+}
+model Message {
+  id         String   @id @default(cuid())
+  
+  sender     User     @relation("sent_messages", fields: [senderId], references: [id], onDelete: Cascade)
+  senderId   String
+  
+  receiver   User     @relation("received_messages", fields: [receiverId], references: [id], onDelete: Cascade)
+  receiverId String
+  
+  text       String
+  
+  read       Boolean  @default(false)
+  
+  createdAt  DateTime @default(now())
+
+  @@index([senderId, receiverId])
+  @@index([receiverId, read])
 }
