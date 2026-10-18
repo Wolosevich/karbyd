@@ -7,11 +7,10 @@ import {
   Avatar,
   Title,
   Text,
-  Loader,
-  Center,
   Alert,
   Divider,
   Button,
+  Skeleton,
 } from "@mantine/core";
 import {
   IconInfoCircle,
@@ -28,6 +27,45 @@ import { useProfile } from "../hooks/useProfile";
 import { useAuth } from "../hooks/useAuth";
 import { useToggleFollow } from "../hooks/useFollow";
 
+function ProfileSkeleton() {
+  return (
+    <Container size="sm" py="xl">
+      <Stack gap="md">
+        <Group justify="space-between" align="flex-start">
+          <Group>
+            <Skeleton height={80} circle />
+            <div>
+              <Skeleton height={24} width={150} radius="xl" mb={8} />
+              <Skeleton height={14} width={200} radius="xl" mb={8} />
+              <Group gap="md">
+                <Skeleton height={12} width={60} radius="xl" />
+                <Skeleton height={12} width={80} radius="xl" />
+                <Skeleton height={12} width={60} radius="xl" />
+              </Group>
+            </div>
+          </Group>
+          <Skeleton height={36} width={120} radius="md" />
+        </Group>
+        <Divider />
+        {/* Скелетоны для постов */}
+        {[1, 2, 3].map((i) => (
+          <div key={i} style={{ border: '1px solid var(--mantine-color-dark-4)', borderRadius: 8, padding: 16 }}>
+            <Group>
+              <Skeleton height={40} circle />
+              <div>
+                <Skeleton height={14} width={100} radius="xl" mb={6} />
+                <Skeleton height={10} width={60} radius="xl" />
+              </div>
+            </Group>
+            <Skeleton height={12} mt="md" radius="xl" />
+            <Skeleton height={12} mt={8} width="70%" radius="xl" />
+          </div>
+        ))}
+      </Stack>
+    </Container>
+  );
+}
+
 export default function Profile() {
   const { username } = useParams<{ username: string }>();
   const { data, isLoading, isError } = useProfile(username || "");
@@ -37,11 +75,7 @@ export default function Profile() {
   const toggleFollow = useToggleFollow(username || "");
 
   if (isLoading) {
-    return (
-      <Center py="xl">
-        <Loader />
-      </Center>
-    );
+    return <ProfileSkeleton />;
   }
 
   if (isError || !data) {

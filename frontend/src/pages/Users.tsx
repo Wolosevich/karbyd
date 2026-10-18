@@ -7,22 +7,55 @@ import {
   Group,
   Avatar,
   Text,
-  Loader,
-  Center,
   Alert,
   Badge,
+  Skeleton,
 } from '@mantine/core';
 import { IconInfoCircle, IconUsers } from '@tabler/icons-react';
 import { useAllUsers } from '../hooks/useAllUsers';
+
+function UserCardSkeleton() {
+  return (
+    <Paper withBorder p="md" radius="md" display="block" w="100%">
+      <Group justify="space-between" wrap="nowrap" gap="sm">
+        <Group wrap="nowrap" gap="sm" style={{ flex: 1, minWidth: 0 }}>
+          <Skeleton height={40} circle style={{ flexShrink: 0 }} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <Skeleton height={16} width="60%" radius="xl" mb={6} />
+            <Skeleton height={12} width="40%" radius="xl" />
+          </div>
+        </Group>
+        <Group gap="sm" wrap="nowrap" style={{ flexShrink: 0 }}>
+          <div style={{ width: 40 }}>
+            <Skeleton height={16} radius="xl" mb={4} />
+            <Skeleton height={10} width={30} radius="xl" />
+          </div>
+          <div style={{ width: 40 }}>
+            <Skeleton height={16} radius="xl" mb={4} />
+            <Skeleton height={10} width={30} radius="xl" />
+          </div>
+        </Group>
+      </Group>
+    </Paper>
+  );
+}
 
 export default function Users() {
   const { data, isLoading, isError } = useAllUsers();
 
   if (isLoading) {
     return (
-      <Center py="xl">
-        <Loader />
-      </Center>
+      <Container size="sm" py="xl">
+        <Stack gap="md">
+          <Group gap="xs" mb="md">
+            <Skeleton height={28} width={150} radius="xl" />
+          </Group>
+          <UserCardSkeleton />
+          <UserCardSkeleton />
+          <UserCardSkeleton />
+          <UserCardSkeleton />
+        </Stack>
+      </Container>
     );
   }
 

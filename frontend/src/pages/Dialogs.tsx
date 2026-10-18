@@ -7,22 +7,45 @@ import {
     Group,
     Avatar,
     Text,
-    Loader,
-    Center,
     Alert,
     Badge,
+    Skeleton
 } from '@mantine/core';
 import { IconInfoCircle, IconMessageCircle } from '@tabler/icons-react';
 import { useDialogs } from '../hooks/useMessages';
+
+function DialogSkeleton() {
+    return (
+        <Paper withBorder p="md" radius="md">
+            <Group justify="space-between" wrap="nowrap">
+                <Group wrap="nowrap">
+                    <Skeleton height={40} circle />
+                    <div>
+                        <Skeleton height={16} width={120} radius="xl" mb={6} />
+                        <Skeleton height={12} width={180} radius="xl" />
+                    </div>
+                </Group>
+            </Group>
+        </Paper>
+    );
+}
 
 export default function Dialogs() {
     const { data, isLoading, isError } = useDialogs();
 
     if (isLoading) {
         return (
-            <Center py="xl">
-                <Loader />
-            </Center>
+            <Container size="sm" py="xl">
+                <Stack gap="md">
+                    <Group gap="xs" mb="md">
+                        <Skeleton height={28} width={150} radius="xl" />
+                    </Group>
+                    <DialogSkeleton />
+                    <DialogSkeleton />
+                    <DialogSkeleton />
+                    <DialogSkeleton />
+                </Stack>
+            </Container>
         );
     }
 
