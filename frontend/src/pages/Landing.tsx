@@ -75,8 +75,8 @@ export default function Landing() {
             </Title>
 
             <Text size="xl" c="dimmed" ta="center" maw={600}>
-              Мини-социальная сеть для общения, обмена фотографиями и новых
-              знакомств. Присоединяйся к сообществу!
+              Добро пожаловать на борт, дорогие друзья!
+              Частная соцсеть любителей активного отдыха и рыбалки
             </Text>
 
             <Group mt="xl">
@@ -129,7 +129,7 @@ export default function Landing() {
         style={{ borderTop: "1px solid var(--mantine-color-dark-6)" }}
       >
         <Text c="dimmed" size="sm">
-          © {new Date().getFullYear()} karbyd. Сделано с ❤️ для портфолио.
+          © {new Date().getFullYear()} KARBYD. Сделано для друзей.
         </Text>
       </Center>
     </Box>
