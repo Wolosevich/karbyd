@@ -17,6 +17,7 @@ export const createCommentSchema = z.object({
         .string()
         .min(1, 'Комментарий не может быть пустым')
         .max(500, 'Максимум 500 символов'),
+    parentId: z.string().optional(),
 });
 
 export type CreatePostInput = z.infer<typeof createPostSchema>;

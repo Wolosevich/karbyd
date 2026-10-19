@@ -32,6 +32,7 @@ export interface Comment {
   text: string;
   authorId: string;
   postId: string;
+  parentId?: string | null;
   author: Pick<User, "id" | "username" | "avatar">;
   createdAt: string;
 }

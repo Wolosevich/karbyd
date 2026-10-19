@@ -55,10 +55,12 @@ export function usePost(id: string) {
 export function useAddComment(postId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (text: string) => postsApi.comment(postId, text),
+    mutationFn: ({ text, parentId }: { text: string; parentId?: string }) =>
+      postsApi.comment(postId, text, parentId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["post", postId] });
-      queryClient.invalidateQueries({ queryKey: ["feed"] });
+      queryClient.invalidateQueries({ queryKey: ['post', postId] });
+      queryClient.invalidateQueries({ queryKey: ['feed'] });
     },
   });
 }
+

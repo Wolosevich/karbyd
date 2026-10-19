@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import { useState } from 'react';
 import { renderTextWithLinks } from "../utils/renderText";
 import {
   Container,
@@ -12,8 +13,9 @@ import {
   Alert,
   Divider,
   ActionIcon,
+  Button,
 } from "@mantine/core";
-import { IconInfoCircle, IconHeart, IconArrowLeft } from "@tabler/icons-react";
+import { IconInfoCircle, IconHeart, IconArrowLeft, IconCornerDownRight } from "@tabler/icons-react";
 import { useNavigate, Link } from "react-router-dom";
 import CommentForm from "../components/CommentForm";
 import { usePost, useLikePost } from "../hooks/usePosts";
@@ -34,6 +36,7 @@ export default function PostDetail() {
   const navigate = useNavigate();
   const { data: post, isLoading, isError } = usePost(id || "");
   const likePost = useLikePost();
+  const [replyingToId, setReplyingToId] = useState<string | null>(null);
 
   if (isLoading) {
     return (
@@ -111,43 +114,113 @@ export default function PostDetail() {
         <CommentForm postId={post.id} />
 
         {post.comments && post.comments.length > 0 ? (
-          post.comments.map((comment) => (
-            <Paper key={comment.id} withBorder p="md" radius="md">
-              <Group mb="xs">
-                <Avatar
-                  src={comment.author.avatar}
-                  radius="xl"
-                  size="sm"
-                  component={Link}
-                  to={`/profile/${comment.author.username}`}
-                  style={{ cursor: "pointer" }}
-                >
-                  {comment.author.username[0].toUpperCase()}
-                </Avatar>
-                <div>
-                  <Text
-                    component={Link}
-                    to={`/profile/${comment.author.username}`}
-                    fw={500}
-                    size="sm"
-                    style={{ textDecoration: "none" }}
-                    c="inherit"
-                  >
-                    {comment.author.username}
-                  </Text>
-                  <Text size="xs" c="dimmed">
-                    {formatDate(comment.createdAt)}
-                  </Text>
+          // 1. Сначала показываем ТОЛЬКО главные комментарии (без parentId)
+          post.comments
+            .filter((c) => !c.parentId)
+            .map((comment) => {
+              // 2. Ищем ответы, которые относятся именно к этому комментарию
+              const replies = post.comments?.filter((c) => c.parentId === comment.id) || [];
+
+              return (
+                <div key={comment.id} style={{ marginBottom: 8 }}>
+                  {/* Карточка самого комментария */}
+                  <Paper withBorder p="md" radius="md">
+                    <Group justify="space-between" mb="xs">
+                      <Group>
+                        <Avatar
+                          src={comment.author.avatar}
+                          radius="xl"
+                          size="sm"
+                          component={Link}
+                          to={`/profile/${comment.author.username}`}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          {comment.author.username[0].toUpperCase()}
+                        </Avatar>
+                        <div>
+                          <Text
+                            component={Link}
+                            to={`/profile/${comment.author.username}`}
+                            fw={500}
+                            size="sm"
+                            style={{ textDecoration: 'none' }}
+                            c="inherit"
+                          >
+                            {comment.author.username}
+                          </Text>
+                          <Text size="xs" c="dimmed">
+                            {formatDate(comment.createdAt)}
+                          </Text>
+                        </div>
+                      </Group>
+
+                      {/* Кнопка Ответить */}
+                      <Button
+                        variant="subtle"
+                        size="compact-xs"
+                        leftSection={<IconCornerDownRight size={14} />}
+                        onClick={() => setReplyingToId(replyingToId === comment.id ? null : comment.id)}
+                      >
+                        Ответить
+                      </Button>
+                    </Group>
+
+                    <Text size="sm" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                      {renderTextWithLinks(comment.text)}
+                    </Text>
+                  </Paper>
+
+                  {/* Форма ответа (появляется при клике на "Ответить") */}
+                  {replyingToId === comment.id && (
+                    <div style={{ marginLeft: 32, marginTop: 8, marginBottom: 16 }}>
+                      <CommentForm
+                        postId={post.id}
+                        parentId={comment.id}
+                        onCancel={() => setReplyingToId(null)}
+                      />
+                    </div>
+                  )}
+
+                  {/* Сами ответы (сдвинутые вправо) */}
+                  {replies.length > 0 && (
+                    <div style={{ marginLeft: 32, marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {replies.map((reply) => (
+                        <Paper key={reply.id} withBorder p="sm" radius="md">
+                          <Group mb="xs">
+                            <Avatar
+                              src={reply.author.avatar}
+                              radius="xl"
+                              size="xs"
+                              component={Link}
+                              to={`/profile/${reply.author.username}`}
+                              style={{ cursor: 'pointer' }}
+                            >
+                              {reply.author.username[0].toUpperCase()}
+                            </Avatar>
+                            <Text
+                              component={Link}
+                              to={`/profile/${reply.author.username}`}
+                              fw={500}
+                              size="xs"
+                              style={{ textDecoration: 'none' }}
+                              c="inherit"
+                            >
+                              {reply.author.username}
+                            </Text>
+                            <Text size="10px" c="dimmed">
+                              {formatDate(reply.createdAt)}
+                            </Text>
+                          </Group>
+                          <Text size="sm" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                            {renderTextWithLinks(reply.text)}
+                          </Text>
+                        </Paper>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </Group>
-              <Text
-                size="sm"
-                style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-              >
-                {renderTextWithLinks(comment.text)}
-              </Text>
-            </Paper>
-          ))
+              );
+            })
         ) : (
           <Text c="dimmed" size="sm" ta="center">
             Пока нет комментариев. Будьте первым!

@@ -22,8 +22,8 @@ export const postsApi = {
   like: (id: string) =>
     api.post<{ liked: boolean }>(`/posts/${id}/like`).then((res) => res.data),
 
-  comment: (id: string, text: string) =>
+  comment: (id: string, text: string, parentId?: string) =>
     api
-      .post<Comment>(`/posts/${id}/comments`, { text })
+      .post<Comment>(`/posts/${id}/comments`, { text, parentId })
       .then((res) => res.data),
 };

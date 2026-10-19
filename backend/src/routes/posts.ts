@@ -184,6 +184,7 @@ export async function postRoutes(app: FastifyInstance) {
           text: parsed.data.text,
           postId,
           authorId: req.user.userId,
+          parentId: parsed.data.parentId || null,
         },
         include: {
           author: { select: { id: true, username: true, avatar: true } },
