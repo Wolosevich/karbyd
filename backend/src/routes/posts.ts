@@ -85,7 +85,28 @@ export async function postRoutes(app: FastifyInstance) {
 
     return reply.code(201).send(post);
   });
+  // GET /api/posts/search?q=... — поиск постов по тексту
+  app.get("/search", async (req) => {
+    const { q } = req.query as { q?: string };
 
+    if (!q || q.trim().length === 0) {
+      return { items: [] };
+    }
+
+    const posts = await prisma.post.findMany({
+      where: {
+        text: { contains: q, mode: "insensitive" },
+      },
+      take: 20,
+      orderBy: { createdAt: "desc" },
+      include: {
+        author: { select: { id: true, username: true, avatar: true } },
+        _count: { select: { likes: true, comments: true } },
+      },
+    });
+
+    return { items: posts };
+  });
   // GET /api/posts/:id — один пост
   app.get("/:id", async (req, reply) => {
     const { id } = req.params as { id: string };

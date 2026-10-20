@@ -11,6 +11,10 @@ export const postsApi = {
         },
       })
       .then((res) => res.data),
+  search: (q: string) =>
+    api
+      .get<{ items: Post[] }>("/posts/search", { params: { q } })
+      .then((res) => res.data),
 
   get: (id: string) => api.get<Post>(`/posts/${id}`).then((res) => res.data),
 

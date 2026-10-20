@@ -44,6 +44,7 @@ export function useDeletePost() {
     },
   });
 }
+
 export function usePost(id: string) {
   return useQuery({
     queryKey: ["post", id],
@@ -58,9 +59,16 @@ export function useAddComment(postId: string) {
     mutationFn: ({ text, parentId }: { text: string; parentId?: string }) =>
       postsApi.comment(postId, text, parentId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['post', postId] });
-      queryClient.invalidateQueries({ queryKey: ['feed'] });
+      queryClient.invalidateQueries({ queryKey: ["post", postId] });
+      queryClient.invalidateQueries({ queryKey: ["feed"] });
     },
   });
 }
 
+export function useSearchPosts(query: string) {
+  return useQuery({
+    queryKey: ["posts", "search", query],
+    queryFn: () => postsApi.search(query),
+    enabled: query.trim().length > 0,
+  });
+}
