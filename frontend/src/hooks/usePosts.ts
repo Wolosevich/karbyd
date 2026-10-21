@@ -72,3 +72,22 @@ export function useSearchPosts(query: string) {
     enabled: query.trim().length > 0,
   });
 }
+export function useUpdatePost() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      text,
+      image,
+    }: {
+      id: string;
+      text: string;
+      image?: string;
+    }) => postsApi.update(id, { text, image }),
+    onSuccess: () => {
+      // Обновляем ленту и страницу конкретного поста
+      queryClient.invalidateQueries({ queryKey: ["feed"] });
+      queryClient.invalidateQueries({ queryKey: ["post"] });
+    },
+  });
+}

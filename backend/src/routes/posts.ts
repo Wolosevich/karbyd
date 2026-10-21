@@ -143,6 +143,46 @@ export async function postRoutes(app: FastifyInstance) {
     return reply.code(204).send();
   });
 
+  // PATCH /api/posts/:id — редактировать свой пост
+  app.patch("/:id", { preHandler: [app.authenticate] }, async (req, reply) => {
+    const { id } = req.params as { id: string };
+
+    // Используем ту же схему валидации, что и при создании
+    const parsed = createPostSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return reply.code(400).send({
+        error: "Некорректные данные",
+        details: parsed.error.issues.map((i) => i.message),
+      });
+    }
+
+    const post = await prisma.post.findUnique({ where: { id } });
+    if (!post) return reply.code(404).send({ error: "Пост не найден" });
+
+    // Проверяем, что редактирует автор поста
+    if (post.authorId !== req.user.userId) {
+      return reply
+        .code(403)
+        .send({ error: "Можно редактировать только свои посты" });
+    }
+
+    const { text, image } = parsed.data;
+
+    const updatedPost = await prisma.post.update({
+      where: { id },
+      data: {
+        text,
+        image: image || null,
+      },
+      include: {
+        author: { select: { id: true, username: true, avatar: true } },
+        _count: { select: { likes: true, comments: true } },
+      },
+    });
+
+    return updatedPost;
+  });
+
   // POST /api/posts/:id/like — поставить/снять лайк
   app.post(
     "/:id/like",

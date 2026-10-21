@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { renderTextWithLinks } from "../utils/renderText";
 import {
@@ -9,9 +10,15 @@ import {
   Image,
   Menu,
 } from "@mantine/core";
-import { IconHeart, IconMessageCircle, IconTrash } from "@tabler/icons-react";
+import {
+  IconHeart,
+  IconMessageCircle,
+  IconTrash,
+  IconPencil,
+} from "@tabler/icons-react";
 import { useLikePost, useDeletePost } from "../hooks/usePosts";
 import { useAuth } from "../hooks/useAuth";
+import EditPostModal from "./EditPostModal";
 import type { Post } from "../types";
 
 function formatDate(dateString: string) {
@@ -30,22 +37,23 @@ export default function PostCard({ post }: { post: Post }) {
   const likePost = useLikePost();
   const deletePost = useDeletePost();
 
+  const [editOpened, setEditOpened] = useState(false);
   const isOwner = user?.id === post.authorId;
 
   return (
-    <Paper withBorder p="md" radius="md">
-      <Group justify="space-between" mb="sm">
-        <Group>
-          <Avatar
-            src={post.author.avatar}
-            radius="xl"
-            component={Link}
-            to={`/profile/${post.author.username}`}
-            style={{ cursor: "pointer" }}
-          >
-            {post.author.username[0].toUpperCase()}
-          </Avatar>
-          <div>
+    <>
+      <Paper withBorder p="md" radius="md">
+        <Group justify="space-between" mb="sm" align="flex-start">
+          <Group>
+            <Avatar
+              src={post.author.avatar}
+              radius="xl"
+              component={Link}
+              to={`/profile/${post.author.username}`}
+              style={{ cursor: "pointer" }}
+            >
+              {post.author.username[0].toUpperCase()}
+            </Avatar>
             <Text
               component={Link}
               to={`/profile/${post.author.username}`}
@@ -55,72 +63,85 @@ export default function PostCard({ post }: { post: Post }) {
             >
               {post.author.username}
             </Text>
-          </div>
+          </Group>
+
+          <Group gap="xs">
+            <Text
+              component={Link}
+              to={`/post/${post.id}`}
+              size="xs"
+              c="dimmed"
+              style={{ textDecoration: "none" }}
+            >
+              {formatDate(post.createdAt)}
+            </Text>
+            {isOwner && (
+              <Menu shadow="md" width={160}>
+                <Menu.Target>
+                  <ActionIcon variant="subtle" color="gray">
+                    ⋯
+                  </ActionIcon>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Item
+                    leftSection={<IconPencil size={16} />}
+                    onClick={() => setEditOpened(true)}
+                  >
+                    Редактировать
+                  </Menu.Item>
+                  <Menu.Item
+                    color="red"
+                    leftSection={<IconTrash size={16} />}
+                    onClick={() => deletePost.mutate(post.id)}
+                  >
+                    Удалить
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            )}
+          </Group>
         </Group>
 
-        <Group gap="xs">
-          <Text
-            component={Link}
-            to={`/post/${post.id}`}
-            size="xs"
-            c="dimmed"
-            style={{ textDecoration: "none" }}
-          >
-            {formatDate(post.createdAt)}
-          </Text>
-
-          {isOwner && (
-            <Menu shadow="md" width={160}>
-              <Menu.Target>
-                <ActionIcon variant="subtle" color="gray">
-                  ⋯
-                </ActionIcon>
-              </Menu.Target>
-              <Menu.Dropdown>
-                <Menu.Item
-                  color="red"
-                  leftSection={<IconTrash size={16} />}
-                  onClick={() => deletePost.mutate(post.id)}
-                >
-                  Удалить
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
-          )}
-        </Group>
-      </Group>
-
-      <Text style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-        {renderTextWithLinks(post.text)}
-      </Text>
-
-      {post.image && <Image src={post.image} radius="md" mt="sm" alt="" />}
-
-      <Group mt="md" gap="lg">
-        <ActionIcon
-          variant="subtle"
-          color="red"
-          onClick={() => likePost.mutate(post.id)}
-          loading={likePost.isPending}
-        >
-          <IconHeart size={20} />
-        </ActionIcon>
-        <Text size="sm" c="dimmed">
-          {post._count?.likes ?? 0}
+        <Text style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+          {renderTextWithLinks(post.text)}
         </Text>
 
-        <Link
-          to={`/post/${post.id}`}
-          style={{ textDecoration: "none", color: "inherit" }}
-        >
-          <Group gap="xs" style={{ cursor: "pointer" }}>
-            <IconMessageCircle size={20} color="gray" />
-            <Text size="sm" c="dimmed">
-              {post._count?.comments ?? 0}
-            </Text>
-          </Group>
-        </Link>
-      </Group>
-    </Paper>
+        {post.image && <Image src={post.image} radius="md" mt="sm" alt="" />}
+
+        <Group mt="md" gap="lg">
+          <ActionIcon
+            variant="subtle"
+            color="red"
+            onClick={() => likePost.mutate(post.id)}
+            loading={likePost.isPending}
+          >
+            <IconHeart size={20} />
+          </ActionIcon>
+          <Text size="sm" c="dimmed">
+            {post._count?.likes ?? 0}
+          </Text>
+
+          <Link
+            to={`/post/${post.id}`}
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            <Group gap="xs" style={{ cursor: "pointer" }}>
+              <IconMessageCircle size={20} color="gray" />
+              <Text size="sm" c="dimmed">
+                {post._count?.comments ?? 0}
+              </Text>
+            </Group>
+          </Link>
+        </Group>
+      </Paper>
+
+      {isOwner && (
+        <EditPostModal
+          opened={editOpened}
+          onClose={() => setEditOpened(false)}
+          post={post}
+        />
+      )}
+    </>
   );
 }

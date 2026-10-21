@@ -23,6 +23,9 @@ export const postsApi = {
 
   delete: (id: string) => api.delete(`/posts/${id}`).then((res) => res.data),
 
+  update: (id: string, data: { text: string; image?: string }) =>
+    api.patch<Post>(`/posts/${id}`, data).then((res) => res.data),
+
   like: (id: string) =>
     api.post<{ liked: boolean }>(`/posts/${id}/like`).then((res) => res.data),
 
