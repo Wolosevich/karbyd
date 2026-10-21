@@ -9,10 +9,12 @@ import {
   FileButton,
   ActionIcon,
   Loader,
+  Popover,
 } from "@mantine/core";
-import { IconPhoto, IconX } from "@tabler/icons-react";
+import { IconPhoto, IconX, IconMoodSmile } from "@tabler/icons-react";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
+import EmojiPicker from "emoji-picker-react";
 import { useCreatePost } from "../hooks/usePosts";
 import { useUpload } from "../hooks/useUpload";
 
@@ -20,6 +22,9 @@ export default function PostForm() {
   const createPost = useCreatePost();
   const { uploadImage, isUploading } = useUpload();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  // Состояние для открытия панели эмодзи
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
 
   const form = useForm({
     initialValues: { text: "" },
@@ -93,6 +98,36 @@ export default function PostForm() {
 
         <Group justify="space-between" mt="sm">
           <Group gap="xs">
+            {/* Пикер эмодзи для поста */}
+            <Popover
+              opened={emojiPickerOpen}
+              onChange={setEmojiPickerOpen}
+              position="top-start"
+              shadow="md"
+            >
+              <Popover.Target>
+                <ActionIcon
+                  variant="subtle"
+                  size="lg"
+                  onClick={() => setEmojiPickerOpen((o) => !o)}
+                >
+                  <IconMoodSmile size={20} />
+                </ActionIcon>
+              </Popover.Target>
+              <Popover.Dropdown p={0}>
+                <EmojiPicker
+                  onEmojiClick={(emojiData) => {
+                    // Добавляем эмодзи в конец текста формы
+                    form.setFieldValue(
+                      "text",
+                      form.values.text + emojiData.emoji,
+                    );
+                    setEmojiPickerOpen(false);
+                  }}
+                />
+              </Popover.Dropdown>
+            </Popover>
+
             <FileButton
               onChange={handleFileSelect}
               accept="image/png,image/jpeg,image/webp,image/gif"
