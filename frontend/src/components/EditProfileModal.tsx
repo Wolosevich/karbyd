@@ -1,16 +1,20 @@
 import { useEffect } from "react";
 import {
   Modal,
-  TextInput,
+  //TextInput,
   Textarea,
   Button,
   Stack,
   Avatar,
   Group,
+  FileButton,
+  Loader,
 } from "@mantine/core";
+import { IconUpload } from "@tabler/icons-react";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useUpdateProfile } from "../hooks/useUpdateProfile";
+import { useUpload } from "../hooks/useUpload";
 import type { User } from "../types";
 
 interface Props {
@@ -21,6 +25,7 @@ interface Props {
 
 export default function EditProfileModal({ opened, onClose, user }: Props) {
   const updateProfile = useUpdateProfile();
+  const { uploadImage, isUploading } = useUpload();
 
   const form = useForm({
     initialValues: {
@@ -29,19 +34,9 @@ export default function EditProfileModal({ opened, onClose, user }: Props) {
     },
     validate: {
       bio: (v) => (v.length > 200 ? "Максимум 200 символов" : null),
-      avatar: (v) => {
-        if (!v) return null;
-        try {
-          new URL(v);
-          return null;
-        } catch {
-          return "Некорректная ссылка";
-        }
-      },
     },
   });
 
-  // Обновляем поля формы, когда открывается модалка
   useEffect(() => {
     if (opened) {
       form.setValues({
@@ -51,6 +46,19 @@ export default function EditProfileModal({ opened, onClose, user }: Props) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened, user.bio, user.avatar]);
+
+  // Обработка выбора файла аватарки
+  const handleAvatarUpload = async (file: File | null) => {
+    if (!file) return;
+    const url = await uploadImage(file);
+    if (url) {
+      form.setFieldValue("avatar", url);
+      notifications.show({
+        message: "Аватар загружен! Нажмите «Сохранить».",
+        color: "green",
+      });
+    }
+  };
 
   const handleSubmit = form.onSubmit(async (values) => {
     try {
@@ -80,12 +88,28 @@ export default function EditProfileModal({ opened, onClose, user }: Props) {
             <Avatar src={form.values.avatar} size={60} radius="xl">
               {user.username[0].toUpperCase()}
             </Avatar>
-            <TextInput
-              label="Аватар (URL)"
-              placeholder="https://..."
-              style={{ flex: 1 }}
-              {...form.getInputProps("avatar")}
-            />
+
+            <FileButton
+              onChange={handleAvatarUpload}
+              accept="image/png,image/jpeg,image/webp,image/gif"
+            >
+              {(props) => (
+                <Button
+                  {...props}
+                  variant="default"
+                  leftSection={
+                    isUploading ? (
+                      <Loader size={16} />
+                    ) : (
+                      <IconUpload size={16} />
+                    )
+                  }
+                  disabled={isUploading}
+                >
+                  {isUploading ? "Загрузка..." : "Загрузить фото"}
+                </Button>
+              )}
+            </FileButton>
           </Group>
 
           <Textarea
