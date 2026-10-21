@@ -14,16 +14,23 @@ import {
   TextInput,
   Box,
   Title,
+  Popover,
 } from "@mantine/core";
-import { IconInfoCircle, IconArrowLeft, IconSend } from "@tabler/icons-react";
+import {
+  IconInfoCircle,
+  IconArrowLeft,
+  IconSend,
+  IconMoodSmile,
+} from "@tabler/icons-react";
+import EmojiPicker from "emoji-picker-react";
 import { useAuth } from "../hooks/useAuth";
 import { useChat, useSendMessage } from "../hooks/useMessages";
 
+// Вспомогательная функция для красивых дат
 function formatDateLabel(dateString: string) {
   const date = new Date(dateString);
   const now = new Date();
 
-  // Сбрасываем время для сравнения дат
   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   const n = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
@@ -46,7 +53,9 @@ export default function Chat() {
   const navigate = useNavigate();
   const { data, isLoading, isError } = useChat(username || "");
   const sendMessage = useSendMessage(username || "");
+
   const [text, setText] = useState("");
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Автоскролл вниз при новых сообщениях
@@ -203,6 +212,31 @@ export default function Chat() {
 
         {/* Поле ввода */}
         <Group gap="xs" wrap="nowrap">
+          <Popover
+            opened={emojiPickerOpen}
+            onChange={setEmojiPickerOpen}
+            position="top-start"
+            shadow="md"
+          >
+            <Popover.Target>
+              <ActionIcon
+                variant="subtle"
+                size="lg"
+                onClick={() => setEmojiPickerOpen((o) => !o)}
+              >
+                <IconMoodSmile size={20} />
+              </ActionIcon>
+            </Popover.Target>
+            <Popover.Dropdown p={0}>
+              <EmojiPicker
+                onEmojiClick={(emojiData) => {
+                  setText((prev) => prev + emojiData.emoji);
+                  setEmojiPickerOpen(false);
+                }}
+              />
+            </Popover.Dropdown>
+          </Popover>
+
           <TextInput
             placeholder="Введите сообщение..."
             style={{ flex: 1 }}
