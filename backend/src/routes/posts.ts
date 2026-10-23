@@ -85,6 +85,39 @@ export async function postRoutes(app: FastifyInstance) {
 
     return reply.code(201).send(post);
   });
+  // POST /api/posts/:id/save — сохранить/убрать из закладок
+  app.post(
+    "/:id/save",
+    { preHandler: [app.authenticate] },
+    async (req, reply) => {
+      const { id: postId } = req.params as { id: string };
+      const userId = req.user.userId;
+
+      // Проверяем, что пост существует
+      const post = await prisma.post.findUnique({ where: { id: postId } });
+      if (!post) return reply.code(404).send({ error: "Пост не найден" });
+
+      // Ищем, сохранял ли уже этот пользователь пост
+      const existing = await prisma.savedPost.findUnique({
+        where: { userId_postId: { userId, postId } },
+      });
+
+      // Если сохранял — удаляем (убираем из закладок)
+      if (existing) {
+        await prisma.savedPost.delete({
+          where: { userId_postId: { userId, postId } },
+        });
+        return { saved: false };
+      }
+
+      // Если не сохранял — создаем (добавляем в закладки)
+      await prisma.savedPost.create({
+        data: { userId, postId },
+      });
+
+      return { saved: true };
+    },
+  );
   // GET /api/posts/search?q=... — поиск постов по тексту
   app.get("/search", async (req) => {
     const { q } = req.query as { q?: string };
@@ -107,6 +140,32 @@ export async function postRoutes(app: FastifyInstance) {
 
     return { items: posts };
   });
+
+  // GET /api/posts/saved — получить список своих сохраненных постов
+  app.get(
+    "/saved",
+    { preHandler: [app.authenticate] },
+    async (req) => {
+      const userId = req.user.userId;
+
+      const saved = await prisma.savedPost.findMany({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+        include: {
+          post: {
+            include: {
+              author: { select: { id: true, username: true, avatar: true } },
+              _count: { select: { likes: true, comments: true } },
+            },
+          },
+        },
+      });
+
+      const items = saved.map((s) => s.post);
+      return { items };
+    },
+  );
+
   // GET /api/posts/:id — один пост
   app.get("/:id", async (req, reply) => {
     const { id } = req.params as { id: string };
@@ -222,6 +281,8 @@ export async function postRoutes(app: FastifyInstance) {
       return { liked: true };
     },
   );
+
+
 
   // POST /api/posts/:id/comments — добавить комментарий
   app.post(

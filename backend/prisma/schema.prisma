@@ -16,6 +16,7 @@ model User {
   posts     Post[]
   comments  Comment[]
   likes     Like[]
+  savedPosts SavedPost[]
   following Follow[]  @relation("follower")
   followers Follow[]  @relation("following")
   notifications Notification[] @relation("user_notifications")
@@ -33,6 +34,7 @@ model Post {
   authorId  String
   comments  Comment[]
   likes     Like[]
+  savedBy   SavedPost[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -116,4 +118,15 @@ model Message {
 
   @@index([senderId, receiverId])
   @@index([receiverId, read])
+}
+model SavedPost {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId]) // Один пользователь может сохранить пост только один раз
+  @@index([userId])
 }

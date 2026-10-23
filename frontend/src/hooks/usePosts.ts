@@ -91,3 +91,20 @@ export function useUpdatePost() {
     },
   });
 }
+export function useToggleSave() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => postsApi.toggleSave(id),
+    onSuccess: () => {
+      // Обновляем кэш сохраненных постов, чтобы список сразу изменился
+      queryClient.invalidateQueries({ queryKey: ['saved'] });
+    },
+  });
+}
+
+export function useSavedPosts() {
+  return useQuery({
+    queryKey: ['saved'],
+    queryFn: () => postsApi.getSaved(),
+  });
+}

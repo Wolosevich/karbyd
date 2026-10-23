@@ -8,6 +8,7 @@ import {
   IconSearch,
   IconUsers,
   IconMessage,
+  IconBookmark,
 } from "@tabler/icons-react";
 import { useAuth } from "../hooks/useAuth";
 import { Indicator } from "@mantine/core"; // добавь Indicator в импорт из @mantine/core
@@ -101,6 +102,12 @@ export default function Navbar() {
               onClick={() => navigate(`/profile/${user.username}`)}
             >
               Профиль
+            </Menu.Item>
+            <Menu.Item
+              leftSection={<IconBookmark size={16} />}
+              onClick={() => navigate('/saved')}
+            >
+              Закладки
             </Menu.Item>
             <Menu.Item
               leftSection={<IconLogout size={16} />}

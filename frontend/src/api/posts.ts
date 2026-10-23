@@ -26,6 +26,12 @@ export const postsApi = {
   update: (id: string, data: { text: string; image?: string }) =>
     api.patch<Post>(`/posts/${id}`, data).then((res) => res.data),
 
+  toggleSave: (id: string) =>
+    api.post<{ saved: boolean }>(`/posts/${id}/save`).then((res) => res.data),
+
+  getSaved: () =>
+    api.get<{ items: Post[] }>('/posts/saved').then((res) => res.data),
+
   like: (id: string) =>
     api.post<{ liked: boolean }>(`/posts/${id}/like`).then((res) => res.data),
 

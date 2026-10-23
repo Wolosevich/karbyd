@@ -12,6 +12,7 @@ import Navbar from "./components/Navbar";
 import { useAuth } from "./hooks/useAuth";
 import Dialogs from './pages/Dialogs';
 import Chat from './pages/Chat';
+import Saved from './pages/Saved';
 import MobileNavbar from './components/MobileNavbar';
 
 function App() {
@@ -48,6 +49,7 @@ function App() {
           <Route path="/" element={<Feed />} />
           <Route path="/users" element={<Users />} />
           <Route path="/search" element={<Search />} />
+          <Route path="/saved" element={<Saved />} />
           <Route path="/post/:id" element={<PostDetail />} />
           <Route path="/profile/:username" element={<Profile />} />
           <Route path="/notifications" element={<Notifications />} />
