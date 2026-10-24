@@ -110,7 +110,13 @@ model Message {
   receiver   User     @relation("received_messages", fields: [receiverId], references: [id], onDelete: Cascade)
   receiverId String
   
-  text       String
+  text       String   @default("")   // текст может быть пустым, если это только файл
+  
+  // Поля для файла (необязательные)
+  fileUrl    String?
+  fileName   String?
+  fileSize   Int?
+  fileType   String?
   
   read       Boolean  @default(false)
   
@@ -118,8 +124,7 @@ model Message {
 
   @@index([senderId, receiverId])
   @@index([receiverId, read])
-}
-model SavedPost {
+}model SavedPost {
   id        String   @id @default(cuid())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String

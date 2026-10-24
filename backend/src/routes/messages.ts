@@ -41,15 +41,20 @@ export async function messageRoutes(app: FastifyInstance) {
     // Возвращаем массив (сортировка по времени последнего сообщения уже есть благодаря orderBy)
     return { items: Array.from(dialogsMap.values()) };
   });
-  // POST /api/messages — отправить сообщение
-  app.post("/", { preHandler: [app.authenticate] }, async (req, reply) => {
-    const { receiverUsername, text } = req.body as {
+  // POST /api/messages — отправить сообщение (текст или файл)
+  app.post('/', { preHandler: [app.authenticate] }, async (req, reply) => {
+    const { receiverUsername, text, fileUrl, fileName, fileSize, fileType } = req.body as {
       receiverUsername: string;
       text: string;
+      fileUrl?: string;
+      fileName?: string;
+      fileSize?: number;
+      fileType?: string;
     };
 
-    if (!text || text.trim().length === 0) {
-      return reply.code(400).send({ error: "Сообщение не может быть пустым" });
+    // Валидация: сообщение не может быть пустым (должен быть текст ИЛИ файл)
+    if ((!text || text.trim().length === 0) && !fileUrl) {
+      return reply.code(400).send({ error: 'Сообщение не может быть пустым' });
     }
 
     const receiver = await prisma.user.findUnique({
@@ -58,20 +63,22 @@ export async function messageRoutes(app: FastifyInstance) {
     });
 
     if (!receiver) {
-      return reply.code(404).send({ error: "Получатель не найден" });
+      return reply.code(404).send({ error: 'Получатель не найден' });
     }
 
     if (receiver.id === req.user.userId) {
-      return reply
-        .code(400)
-        .send({ error: "Нельзя отправить сообщение самому себе" });
+      return reply.code(400).send({ error: 'Нельзя отправить сообщение самому себе' });
     }
 
     const message = await prisma.message.create({
       data: {
         senderId: req.user.userId,
         receiverId: receiver.id,
-        text: text.trim(),
+        text: text?.trim() || '',
+        fileUrl: fileUrl || null,
+        fileName: fileName || null,
+        fileSize: fileSize || null,
+        fileType: fileType || null,
       },
       include: {
         sender: { select: { id: true, username: true, avatar: true } },
