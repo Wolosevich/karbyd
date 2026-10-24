@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from 'react';
 import {
   Container,
   Stack,
@@ -11,13 +11,14 @@ import {
   Skeleton,
   Paper,
   Group,
-} from "@mantine/core";
-import { IconInfoCircle } from "@tabler/icons-react";
-import SEO from "../components/SEO";
-import PostForm from "../components/PostForm";
-import PostCard from "../components/PostCard";
-import { useFeed } from "../hooks/usePosts";
-import ScrollToTop from "../components/ScrollToTop";
+  Loader,
+} from '@mantine/core';
+import { useIntersection } from '@mantine/hooks';
+import { IconInfoCircle } from '@tabler/icons-react';
+import PostForm from '../components/PostForm';
+import PostCard from '../components/PostCard';
+import ScrollToTop from '../components/ScrollToTop';
+import { useFeed } from '../hooks/usePosts';
 
 // Компонент, который рисует серую карточку-заглушку
 function PostSkeleton() {
@@ -42,7 +43,8 @@ function PostSkeleton() {
 }
 
 export default function Feed() {
-  const [feedType, setFeedType] = useState<"all" | "following">("all");
+  const [feedType, setFeedType] = useState<'all' | 'following'>('all');
+
   const {
     data,
     isLoading,
@@ -54,23 +56,36 @@ export default function Feed() {
 
   const posts = data?.pages.flatMap((page) => page.items) ?? [];
 
+  // --- ЛОГИКА БЕСКОНЕЧНОЙ ПРОКРУТКИ ---
+  // Создаем невидимый элемент-маркер внизу ленты
+  const { ref, entry } = useIntersection({
+    root: null,
+    threshold: 0.1, // Срабатывает, когда элемент виден на 10%
+  });
+
+  // Следим за маркером: если он появился на экране — грузим следующую страницу
+  useEffect(() => {
+    if (entry?.isIntersecting && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [entry?.isIntersecting, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   return (
     <Container size="sm" py="xl">
-      <SEO title="Лента — karbyd" />
       <Stack gap="md">
         <Title order={2}>Лента</Title>
 
         <SegmentedControl
           value={feedType}
-          onChange={(value) => setFeedType(value as "all" | "following")}
+          onChange={(value) => setFeedType(value as 'all' | 'following')}
           data={[
-            { label: "Все посты", value: "all" },
-            { label: "Подписки", value: "following" },
+            { label: 'Все посты', value: 'all' },
+            { label: 'Подписки', value: 'following' },
           ]}
           fullWidth
         />
 
-        {feedType === "all" && <PostForm />}
+        {feedType === 'all' && <PostForm />}
 
         {isLoading && (
           <Stack gap="md">
@@ -90,7 +105,7 @@ export default function Feed() {
           </Alert>
         )}
 
-        {!isLoading && posts.length === 0 && feedType === "all" && (
+        {!isLoading && posts.length === 0 && feedType === 'all' && (
           <Alert
             color="blue"
             icon={<IconInfoCircle size={16} />}
@@ -100,7 +115,7 @@ export default function Feed() {
           </Alert>
         )}
 
-        {!isLoading && posts.length === 0 && feedType === "following" && (
+        {!isLoading && posts.length === 0 && feedType === 'following' && (
           <Alert
             color="blue"
             icon={<IconInfoCircle size={16} />}
@@ -114,25 +129,21 @@ export default function Feed() {
           <PostCard key={post.id} post={post} />
         ))}
 
-        {hasNextPage && (
-          <Center>
-            <Button
-              variant="default"
-              onClick={() => fetchNextPage()}
-              loading={isFetchingNextPage}
-            >
-              Показать ещё
-            </Button>
-          </Center>
-        )}
+        {/* Маркер для бесконечной прокрутки */}
+        <div ref={ref} style={{ height: 20, marginTop: 10 }}>
+          {isFetchingNextPage && (
+            <Center>
+              <Loader size="sm" />
+            </Center>
+          )}
+          {!hasNextPage && posts.length > 0 && (
+            <Text c="dimmed" ta="center" size="sm">
+              Это все посты на данный момент
+            </Text>
+          )}
+        </div>
 
-        {!hasNextPage && posts.length > 0 && (
-          <Text c="dimmed" ta="center" size="sm">
-            Это все посты на данный момент
-          </Text>
-        )}
       </Stack>
-      {/* ...весь код... */}
 
       <ScrollToTop />
     </Container>
