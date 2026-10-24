@@ -6,7 +6,6 @@ import {
   Text,
   Center,
   Alert,
-  Button,
   SegmentedControl,
   Skeleton,
   Paper,
