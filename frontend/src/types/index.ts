@@ -49,6 +49,10 @@ export interface Message {
   read: boolean;
   createdAt: string;
   sender: Pick<User, 'id' | 'username' | 'avatar'>;
+  fileUrl?: string | null;
+  fileName?: string | null;
+  fileSize?: number | null;
+  fileType?: string | null;
 }
 
 export interface Dialog {

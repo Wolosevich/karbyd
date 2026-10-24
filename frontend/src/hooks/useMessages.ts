@@ -22,10 +22,16 @@ export function useSendMessage(username: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (text: string) => messagesApi.send(username, text),
+    mutationFn: ({
+      text,
+      file,
+    }: {
+      text: string;
+      file?: { url: string; name: string; size: number; type: string };
+    }) => messagesApi.send(username, text, file),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["chat", username] });
-      queryClient.invalidateQueries({ queryKey: ["dialogs"] });
+      queryClient.invalidateQueries({ queryKey: ['chat', username] });
+      queryClient.invalidateQueries({ queryKey: ['dialogs'] });
     },
   });
 }

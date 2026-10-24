@@ -8,9 +8,24 @@ export const messagesApi = {
   getChat: (username: string) =>
     api.get<ChatResponse>(`/messages/${username}`).then((res) => res.data),
 
-  send: (receiverUsername: string, text: string) =>
+  send: (
+    receiverUsername: string,
+    text: string,
+    file?: { url: string; name: string; size: number; type: string }
+  ) =>
     api
-      .post<Message>("/messages", { receiverUsername, text })
+      .post<Message>('/messages', {
+        receiverUsername,
+        text,
+        ...(file
+          ? {
+            fileUrl: file.url,
+            fileName: file.name,
+            fileSize: file.size,
+            fileType: file.type,
+          }
+          : {}),
+      })
       .then((res) => res.data),
 
   deleteDialog: (username: string) =>

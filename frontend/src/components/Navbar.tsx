@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import classes from "./Navbar.module.css";
-import { Avatar, Menu, ActionIcon, Button } from "@mantine/core";
+import { Avatar, Menu, Button } from "@mantine/core";
 import {
   IconLogout,
   IconUser,
@@ -11,12 +11,16 @@ import {
   IconBookmark,
 } from "@tabler/icons-react";
 import { useAuth } from "../hooks/useAuth";
+import { useMantineColorScheme, Tooltip, ActionIcon } from '@mantine/core';
+import { IconSun, IconMoon } from '@tabler/icons-react';
 import { Indicator } from "@mantine/core"; // добавь Indicator в импорт из @mantine/core
 import { IconBell } from "@tabler/icons-react"; // добавь IconBell в импорт иконок
 import { useNotifications } from "../hooks/useNotifications"; // новый импорт
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const { colorScheme, setColorScheme } = useMantineColorScheme();
+  const isDark = colorScheme === 'dark';
   const { data: notifData } = useNotifications();
   const unreadCount = notifData?.unreadCount || 0;
   const navigate = useNavigate();
@@ -88,6 +92,18 @@ export default function Navbar() {
             <IconBell size={18} />
           </ActionIcon>
         </Indicator>
+        {/* Кнопка переключения темы */}
+        <Tooltip label={isDark ? 'Светлая тема' : 'Тёмная тема'}>
+          <ActionIcon
+            variant="subtle"
+            color="gray"
+            size="lg"
+            onClick={() => setColorScheme(isDark ? 'light' : 'dark')}
+            aria-label="Переключить тему"
+          >
+            {isDark ? <IconSun size={20} /> : <IconMoon size={20} />}
+          </ActionIcon>
+        </Tooltip>
         {/* Аватарка с выпадающим меню */}
         <Menu shadow="md" width={200} position="bottom-end">
           <Menu.Target>
