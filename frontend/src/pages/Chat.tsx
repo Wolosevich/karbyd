@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   Container,
   Stack,
@@ -16,7 +16,8 @@ import {
   Title,
   Popover,
   FileButton,
-} from '@mantine/core';
+  useMantineColorScheme, // <-- добавили хук темы
+} from "@mantine/core";
 import {
   IconInfoCircle,
   IconArrowLeft,
@@ -25,11 +26,11 @@ import {
   IconPaperclip,
   IconFile,
   IconDownload,
-} from '@tabler/icons-react';
-import EmojiPicker from 'emoji-picker-react';
-import { useAuth } from '../hooks/useAuth';
-import { useChat, useSendMessage } from '../hooks/useMessages';
-import { useUploadFile } from '../hooks/useUploadFile';
+} from "@tabler/icons-react";
+import EmojiPicker from "emoji-picker-react";
+import { useAuth } from "../hooks/useAuth";
+import { useChat, useSendMessage } from "../hooks/useMessages";
+import { useUploadFile } from "../hooks/useUploadFile";
 
 // Вспомогательная функция для красивых дат
 function formatDateLabel(dateString: string) {
@@ -39,31 +40,41 @@ function formatDateLabel(dateString: string) {
   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   const n = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-  const diffDays = Math.floor((n.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
+  const diffDays = Math.floor(
+    (n.getTime() - d.getTime()) / (1000 * 60 * 60 * 24),
+  );
 
-  if (diffDays === 0) return 'Сегодня';
-  if (diffDays === 1) return 'Вчера';
-  return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+  if (diffDays === 0) return "Сегодня";
+  if (diffDays === 1) return "Вчера";
+  return date.toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 }
 
 // Форматирование размера файла
 function formatFileSize(bytes: number) {
-  if (bytes < 1024) return bytes + ' Б';
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' КБ';
-  return (bytes / (1024 * 1024)).toFixed(1) + ' МБ';
+  if (bytes < 1024) return bytes + " Б";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " КБ";
+  return (bytes / (1024 * 1024)).toFixed(1) + " МБ";
 }
 
 export default function Chat() {
   const { username } = useParams<{ username: string }>();
   const { user: currentUser } = useAuth();
   const navigate = useNavigate();
-  const { data, isLoading, isError } = useChat(username || '');
-  const sendMessage = useSendMessage(username || '');
+  const { data, isLoading, isError } = useChat(username || "");
+  const sendMessage = useSendMessage(username || "");
   const { uploadFile, isUploading } = useUploadFile();
 
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Получаем текущую тему (светлая/тёмная)
+  const { colorScheme } = useMantineColorScheme();
+  const isDark = colorScheme === "dark";
 
   // Автоскролл вниз при новых сообщениях
   useEffect(() => {
@@ -75,23 +86,22 @@ export default function Chat() {
   const handleSend = async () => {
     const trimmed = text.trim();
     if (!trimmed) return;
-    setText('');
+    setText("");
     await sendMessage.mutateAsync({ text: trimmed });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
   };
 
-  // Обработка выбора файла
   const handleFileSelect = async (file: File | null) => {
     if (!file) return;
     const fileData = await uploadFile(file);
     if (fileData) {
-      await sendMessage.mutateAsync({ text: '', file: fileData });
+      await sendMessage.mutateAsync({ text: "", file: fileData });
     }
   };
 
@@ -117,12 +127,12 @@ export default function Chat() {
 
   return (
     <Container size="sm" py="md">
-      <Stack gap="md" style={{ height: 'calc(100vh - 100px)' }}>
+      <Stack gap="md" style={{ height: "calc(100vh - 100px)" }}>
         {/* Шапка чата */}
         <Paper withBorder p="sm" radius="md">
           <Group justify="space-between">
             <Group>
-              <ActionIcon variant="subtle" onClick={() => navigate('/dialogs')}>
+              <ActionIcon variant="subtle" onClick={() => navigate("/dialogs")}>
                 <IconArrowLeft size={20} />
               </ActionIcon>
               <Avatar
@@ -143,10 +153,12 @@ export default function Chat() {
           ref={scrollRef}
           style={{
             flex: 1,
-            overflowY: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
+            overflowY: "auto",
+            display: "flex",
+            flexDirection: "column",
             gap: 8,
+            paddingRight: 8,
+            backgroundColor: isDark ? "var(--mantine-color-dark-8)" : "#F0F0F0",
           }}
         >
           {messages.length === 0 ? (
@@ -167,18 +179,18 @@ export default function Chat() {
                 <div
                   key={msg.id}
                   style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: isMine ? 'flex-end' : 'flex-start',
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: isMine ? "flex-end" : "flex-start",
                     gap: 4,
                   }}
                 >
                   {showDateDivider && (
                     <div
                       style={{
-                        textAlign: 'center',
-                        width: '100%',
-                        margin: '12px 0',
+                        textAlign: "center",
+                        width: "100%",
+                        margin: "12px 0",
                       }}
                     >
                       <Text size="xs" c="dimmed" fw={500}>
@@ -191,10 +203,16 @@ export default function Chat() {
                     p="sm"
                     radius="md"
                     style={{
-                      maxWidth: '75%',
+                      maxWidth: "75%",
+                      // Адаптивные цвета для пузырей сообщений
                       backgroundColor: isMine
-                        ? 'var(--mantine-color-blue-6)'
-                        : 'var(--mantine-color-dark-6)',
+                        ? isDark
+                          ? "var(--mantine-color-blue-6)"
+                          : "#E1FFC7" // Светло-зеленый для своих
+                        : isDark
+                          ? "var(--mantine-color-dark-6)"
+                          : "#FFFFFF", // Белый для входящих
+                      color: isDark ? "var(--mantine-color-white)" : "#000000", // Черный текст в светлой теме
                       borderBottomRightRadius: isMine ? 4 : undefined,
                       borderBottomLeftRadius: !isMine ? 4 : undefined,
                     }}
@@ -202,7 +220,10 @@ export default function Chat() {
                     {msg.text && (
                       <Text
                         size="sm"
-                        style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+                        style={{
+                          whiteSpace: "pre-wrap",
+                          wordBreak: "break-word",
+                        }}
                       >
                         {msg.text}
                       </Text>
@@ -214,17 +235,21 @@ export default function Chat() {
                         withBorder
                         p="xs"
                         radius="sm"
-                        mt={msg.text ? 'xs' : 0}
+                        mt={msg.text ? "xs" : 0}
                         style={{
-                          backgroundColor: isMine
-                            ? 'var(--mantine-color-dark-5)'
-                            : 'var(--mantine-color-dark-5)',
+                          // Адаптивный фон для блока файла
+                          backgroundColor: isDark
+                            ? "rgba(0,0,0,0.15)"
+                            : isMine
+                              ? "rgba(0,0,0,0.05)"
+                              : "rgba(0,0,0,0.03)", // Легкий темный фон для файла
                         }}
                       >
                         <Group gap="xs" wrap="nowrap">
                           <IconFile size={20} />
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <Text size="sm" truncate c="white">
+                            {/* Убрали c="white", теперь цвет наследуется от темы */}
+                            <Text size="sm" truncate c="inherit">
                               {msg.fileName}
                             </Text>
                             {msg.fileSize && (
@@ -250,13 +275,14 @@ export default function Chat() {
 
                     <Text
                       size="10px"
-                      c={isMine ? 'blue.1' : 'dimmed'}
+                      // Адаптивный цвет времени
+                      c={isDark ? "dimmed" : isMine ? "green.8" : "gray.6"}
                       ta="right"
                       mt={4}
                     >
-                      {new Date(msg.createdAt).toLocaleTimeString('ru-RU', {
-                        hour: '2-digit',
-                        minute: '2-digit',
+                      {new Date(msg.createdAt).toLocaleTimeString("ru-RU", {
+                        hour: "2-digit",
+                        minute: "2-digit",
                       })}
                     </Text>
                   </Paper>
@@ -293,7 +319,6 @@ export default function Chat() {
             </Popover.Dropdown>
           </Popover>
 
-          {/* Кнопка загрузки файла */}
           <FileButton onChange={handleFileSelect}>
             {(props) => (
               <ActionIcon
