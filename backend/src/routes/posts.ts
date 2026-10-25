@@ -82,6 +82,36 @@ export async function postRoutes(app: FastifyInstance) {
         _count: { select: { likes: true, comments: true } },
       },
     });
+    // --- ЛОГИКА УПОМИНАНИЙ ---
+    // Ищем все @username в тексте (игнорируем email-ы, поэтому проверяем, что перед @ нет букв/цифр)
+    const mentionRegex = /(?<!\w)@([a-zA-Z0-9_]+)/g;
+    const mentionedUsernames = Array.from(
+      text.matchAll(mentionRegex),
+      (m) => m[1],
+    );
+
+    if (mentionedUsernames.length > 0) {
+      // Ищем этих пользователей в базе
+      const mentionedUsers = await prisma.user.findMany({
+        where: { username: { in: mentionedUsernames } },
+        select: { id: true },
+      });
+
+      for (const mUser of mentionedUsers) {
+        // Не отправляем уведомление, если упомянули сами себя
+        if (mUser.id !== req.user.userId) {
+          await prisma.notification.create({
+            data: {
+              userId: mUser.id,
+              actorId: req.user.userId,
+              type: "mention",
+              postId: post.id,
+            },
+          });
+        }
+      }
+    }
+    // --- КОНЕЦ ЛОГИКИ УПОМИНАНИЙ ---
 
     return reply.code(201).send(post);
   });
@@ -142,29 +172,25 @@ export async function postRoutes(app: FastifyInstance) {
   });
 
   // GET /api/posts/saved — получить список своих сохраненных постов
-  app.get(
-    "/saved",
-    { preHandler: [app.authenticate] },
-    async (req) => {
-      const userId = req.user.userId;
+  app.get("/saved", { preHandler: [app.authenticate] }, async (req) => {
+    const userId = req.user.userId;
 
-      const saved = await prisma.savedPost.findMany({
-        where: { userId },
-        orderBy: { createdAt: "desc" },
-        include: {
-          post: {
-            include: {
-              author: { select: { id: true, username: true, avatar: true } },
-              _count: { select: { likes: true, comments: true } },
-            },
+    const saved = await prisma.savedPost.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      include: {
+        post: {
+          include: {
+            author: { select: { id: true, username: true, avatar: true } },
+            _count: { select: { likes: true, comments: true } },
           },
         },
-      });
+      },
+    });
 
-      const items = saved.map((s) => s.post);
-      return { items };
-    },
-  );
+    const items = saved.map((s) => s.post);
+    return { items };
+  });
 
   // GET /api/posts/:id — один пост
   app.get("/:id", async (req, reply) => {
@@ -281,8 +307,6 @@ export async function postRoutes(app: FastifyInstance) {
       return { liked: true };
     },
   );
-
-
 
   // POST /api/posts/:id/comments — добавить комментарий
   app.post(

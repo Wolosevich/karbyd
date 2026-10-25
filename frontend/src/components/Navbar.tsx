@@ -11,8 +11,8 @@ import {
   IconBookmark,
 } from "@tabler/icons-react";
 import { useAuth } from "../hooks/useAuth";
-import { useMantineColorScheme, Tooltip, ActionIcon } from '@mantine/core';
-import { IconSun, IconMoon } from '@tabler/icons-react';
+import { useMantineColorScheme, Tooltip, ActionIcon } from "@mantine/core";
+import { IconSun, IconMoon } from "@tabler/icons-react";
 import { Indicator } from "@mantine/core"; // добавь Indicator в импорт из @mantine/core
 import { IconBell } from "@tabler/icons-react"; // добавь IconBell в импорт иконок
 import { useNotifications } from "../hooks/useNotifications"; // новый импорт
@@ -20,7 +20,7 @@ import { useNotifications } from "../hooks/useNotifications"; // новый им
 export default function Navbar() {
   const { user, logout } = useAuth();
   const { colorScheme, setColorScheme } = useMantineColorScheme();
-  const isDark = colorScheme === 'dark';
+  const isDark = colorScheme === "dark";
   const { data: notifData } = useNotifications();
   const unreadCount = notifData?.unreadCount || 0;
   const navigate = useNavigate();
@@ -38,7 +38,7 @@ export default function Navbar() {
         karbyd
       </Link>
 
-      <div className={classes.rightSide} style={{ gap: '8px' }}>
+      <div className={classes.rightSide} style={{ gap: "8px" }}>
         {/* Кнопки для десктопа */}
         <div className={classes.desktopOnly}>
           <Button
@@ -65,7 +65,12 @@ export default function Navbar() {
           >
             Пользователи
           </Button>
-          <Button component={Link} to="/dialogs" variant="subtle" leftSection={<IconMessage size={16} />}>
+          <Button
+            component={Link}
+            to="/dialogs"
+            variant="subtle"
+            leftSection={<IconMessage size={16} />}
+          >
             Сообщения
           </Button>
         </div>
@@ -85,7 +90,7 @@ export default function Navbar() {
             component={Link}
             to="/notifications"
             variant="subtle"
-            color="gray"
+            color="blue"
             size="md"
             aria-label="Уведомления"
           >
@@ -93,12 +98,12 @@ export default function Navbar() {
           </ActionIcon>
         </Indicator>
         {/* Кнопка переключения темы */}
-        <Tooltip label={isDark ? 'Светлая тема' : 'Тёмная тема'}>
+        <Tooltip label={isDark ? "Светлая тема" : "Тёмная тема"}>
           <ActionIcon
             variant="subtle"
-            color="gray"
+            color="blue"
             size="lg"
-            onClick={() => setColorScheme(isDark ? 'light' : 'dark')}
+            onClick={() => setColorScheme(isDark ? "light" : "dark")}
             aria-label="Переключить тему"
           >
             {isDark ? <IconSun size={20} /> : <IconMoon size={20} />}
@@ -107,7 +112,12 @@ export default function Navbar() {
         {/* Аватарка с выпадающим меню */}
         <Menu shadow="md" width={200} position="bottom-end">
           <Menu.Target>
-            <Avatar src={user.avatar} radius="xl" size="md" style={{ cursor: "pointer" }}>
+            <Avatar
+              src={user.avatar}
+              radius="xl"
+              size="md"
+              style={{ cursor: "pointer" }}
+            >
               {user.username[0]?.toUpperCase() || "?"}
             </Avatar>
           </Menu.Target>
@@ -121,7 +131,7 @@ export default function Navbar() {
             </Menu.Item>
             <Menu.Item
               leftSection={<IconBookmark size={16} />}
-              onClick={() => navigate('/saved')}
+              onClick={() => navigate("/saved")}
             >
               Закладки
             </Menu.Item>
