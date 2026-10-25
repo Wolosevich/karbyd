@@ -18,6 +18,7 @@ import {
   IconHeart,
   IconMessageCircle,
   IconUserPlus,
+  IconAt,
 } from "@tabler/icons-react";
 import {
   useNotifications,
@@ -71,12 +72,14 @@ export default function Notifications() {
   const getIcon = (type: string) => {
     if (type === "like") return <IconHeart size={16} color="red" />;
     if (type === "comment") return <IconMessageCircle size={16} color="blue" />;
+    if (type === "mention") return <IconAt size={16} color="orange" />;
     return <IconUserPlus size={16} color="teal" />;
   };
 
   const getText = (type: string) => {
     if (type === "like") return "лайкнул(а) ваш пост";
     if (type === "comment") return "прокомментировал(а) ваш пост";
+    if (type === "mention") return "упомянул(а) вас в посте";
     return "подписался(-ась) на вас";
   };
 

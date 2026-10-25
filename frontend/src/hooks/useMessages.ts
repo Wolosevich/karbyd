@@ -14,7 +14,7 @@ export function useChat(username: string) {
     queryKey: ["chat", username],
     queryFn: () => messagesApi.getChat(username),
     enabled: !!username,
-    refetchInterval: 10 * 1000, // Обновлять каждые 10 сек для актуальности
+    /*refetchInterval: 10 * 1000, // Обновлять каждые 10 сек для актуальности*/
   });
 }
 
@@ -29,9 +29,20 @@ export function useSendMessage(username: string) {
       text: string;
       file?: { url: string; name: string; size: number; type: string };
     }) => messagesApi.send(username, text, file),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chat', username] });
-      queryClient.invalidateQueries({ queryKey: ['dialogs'] });
+    onSuccess: (newMessage) => {
+      // Вместо запроса к серверу, просто добавляем сообщение в кэш
+      queryClient.setQueryData(["chat", username], (oldData: any) => {
+        if (!oldData) return oldData;
+        // Проверяем, нет ли уже этого сообщения (чтобы избежать дублей)
+        if (oldData.messages.some((m: any) => m.id === newMessage.id))
+          return oldData;
+        return {
+          ...oldData,
+          messages: [...oldData.messages, newMessage],
+        };
+      });
+      // Список диалогов можно обновить (чтобы там появился последний текст)
+      queryClient.invalidateQueries({ queryKey: ["dialogs"] });
     },
   });
 }

@@ -28,9 +28,11 @@ import {
   IconDownload,
 } from "@tabler/icons-react";
 import EmojiPicker from "emoji-picker-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../hooks/useAuth";
 import { useChat, useSendMessage } from "../hooks/useMessages";
 import { useUploadFile } from "../hooks/useUploadFile";
+import { useWebSocket } from "../hooks/useWebSocket"; // <-- Импорт хука
 
 // Вспомогательная функция для красивых дат
 function formatDateLabel(dateString: string) {
@@ -64,6 +66,8 @@ export default function Chat() {
   const { username } = useParams<{ username: string }>();
   const { user: currentUser } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient(); // <-- Для обновления кэша
+
   const { data, isLoading, isError } = useChat(username || "");
   const sendMessage = useSendMessage(username || "");
   const { uploadFile, isUploading } = useUploadFile();
@@ -74,6 +78,30 @@ export default function Chat() {
 
   const { colorScheme } = useMantineColorScheme();
   const isDark = colorScheme === "dark";
+
+  // --- WEBSOCKET ---
+  const token = localStorage.getItem("token");
+
+  useWebSocket(token || undefined, (payload) => {
+    if (payload.event === "new_message") {
+      const newMessage = payload.data;
+
+      // Добавляем сообщение в кэш текущего чата
+      queryClient.setQueryData(["chat", username], (oldData: any) => {
+        if (!oldData) return oldData;
+        // Защита от дублей
+        if (oldData.messages.some((m: any) => m.id === newMessage.id))
+          return oldData;
+        return {
+          ...oldData,
+          messages: [...oldData.messages, newMessage],
+        };
+      });
+
+      // Обновляем список диалогов (чтобы там отобразилось последнее сообщение)
+      queryClient.invalidateQueries({ queryKey: ["dialogs"] });
+    }
+  });
 
   // Автоскролл вниз при новых сообщениях
   useEffect(() => {
@@ -125,9 +153,9 @@ export default function Chat() {
   const { user, messages } = data;
 
   // Цвета как в WhatsApp/Telegram для светлой и темной темы
-  const chatBg = isDark ? "var(--mantine-color-dark-8)" : "#efeae2"; // Классический фон чата
-  const myBubbleBg = isDark ? "var(--mantine-color-blue-6)" : "#d9fdd3"; // Зеленый для своих
-  const otherBubbleBg = isDark ? "var(--mantine-color-dark-6)" : "#ffffff"; // Белый для чужих
+  const chatBg = isDark ? "var(--mantine-color-dark-8)" : "#efeae2";
+  const myBubbleBg = isDark ? "var(--mantine-color-blue-6)" : "#d9fdd3";
+  const otherBubbleBg = isDark ? "var(--mantine-color-dark-6)" : "#ffffff";
   const textColor = isDark ? "var(--mantine-color-white)" : "#000000";
 
   return (
@@ -153,7 +181,7 @@ export default function Chat() {
           </Group>
         </Paper>
 
-        {/* Основное окно чата (объединяет сообщения и поле ввода) */}
+        {/* Основное окно чата */}
         <Paper
           withBorder
           radius="md"
@@ -238,7 +266,6 @@ export default function Chat() {
                         boxShadow: isDark
                           ? "none"
                           : "0 1px 2px rgba(0,0,0,0.1)",
-                        // Оставляем "хвостик" только с одной стороны
                         borderBottomRightRadius: isMine ? 4 : undefined,
                         borderBottomLeftRadius: !isMine ? 4 : undefined,
                       }}
@@ -255,7 +282,6 @@ export default function Chat() {
                         </Text>
                       )}
 
-                      {/* Отображение файла */}
                       {msg.fileUrl && (
                         <Paper
                           withBorder
@@ -317,7 +343,7 @@ export default function Chat() {
             )}
           </Box>
 
-          {/* Поле ввода (теперь прикреплено к низу окна чата) */}
+          {/* Поле ввода */}
           <Box
             p="sm"
             style={{
