@@ -1,3 +1,4 @@
+import { sendToUser } from "../lib/ws-manager.js";
 import type { FastifyInstance } from "fastify";
 import { prisma } from "../lib/prisma.js";
 
@@ -42,19 +43,20 @@ export async function messageRoutes(app: FastifyInstance) {
     return { items: Array.from(dialogsMap.values()) };
   });
   // POST /api/messages — отправить сообщение (текст или файл)
-  app.post('/', { preHandler: [app.authenticate] }, async (req, reply) => {
-    const { receiverUsername, text, fileUrl, fileName, fileSize, fileType } = req.body as {
-      receiverUsername: string;
-      text: string;
-      fileUrl?: string;
-      fileName?: string;
-      fileSize?: number;
-      fileType?: string;
-    };
+  app.post("/", { preHandler: [app.authenticate] }, async (req, reply) => {
+    const { receiverUsername, text, fileUrl, fileName, fileSize, fileType } =
+      req.body as {
+        receiverUsername: string;
+        text: string;
+        fileUrl?: string;
+        fileName?: string;
+        fileSize?: number;
+        fileType?: string;
+      };
 
     // Валидация: сообщение не может быть пустым (должен быть текст ИЛИ файл)
     if ((!text || text.trim().length === 0) && !fileUrl) {
-      return reply.code(400).send({ error: 'Сообщение не может быть пустым' });
+      return reply.code(400).send({ error: "Сообщение не может быть пустым" });
     }
 
     const receiver = await prisma.user.findUnique({
@@ -63,18 +65,20 @@ export async function messageRoutes(app: FastifyInstance) {
     });
 
     if (!receiver) {
-      return reply.code(404).send({ error: 'Получатель не найден' });
+      return reply.code(404).send({ error: "Получатель не найден" });
     }
 
     if (receiver.id === req.user.userId) {
-      return reply.code(400).send({ error: 'Нельзя отправить сообщение самому себе' });
+      return reply
+        .code(400)
+        .send({ error: "Нельзя отправить сообщение самому себе" });
     }
 
     const message = await prisma.message.create({
       data: {
         senderId: req.user.userId,
         receiverId: receiver.id,
-        text: text?.trim() || '',
+        text: text?.trim() || "",
         fileUrl: fileUrl || null,
         fileName: fileName || null,
         fileSize: fileSize || null,
@@ -84,6 +88,9 @@ export async function messageRoutes(app: FastifyInstance) {
         sender: { select: { id: true, username: true, avatar: true } },
       },
     });
+
+    // Отправляем сообщение получателю через WebSocket в реальном времени
+    sendToUser(receiver.id, "new_message", message);
 
     return reply.code(201).send(message);
   });

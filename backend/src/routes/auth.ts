@@ -84,18 +84,19 @@ export async function authRoutes(app: FastifyInstance) {
       })
       .send({
         user: { id: user.id, email: user.email, username: user.username },
+        token,
       });
   });
 
   // POST /api/auth/logout — выход
   // POST /api/auth/logout — выход
-  app.post('/logout', async (_req, reply) => {
+  app.post("/logout", async (_req, reply) => {
     reply
-      .clearCookie('token', {
-        path: '/',
+      .clearCookie("token", {
+        path: "/",
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        secure: process.env.NODE_ENV === "production",
       })
       .send({ ok: true });
   });

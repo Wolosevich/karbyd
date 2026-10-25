@@ -4,13 +4,15 @@ import cookie from "@fastify/cookie";
 import cors from "@fastify/cors";
 import authPlugin from "./plugins/auth.js";
 import { authRoutes } from "./routes/auth.js";
+import { wsRoutes } from "./routes/ws.js";
 import { postRoutes } from "./routes/posts.js";
 import { userRoutes } from "./routes/users.js";
 import multipart from "@fastify/multipart";
 import { uploadRoutes } from "./routes/upload.js";
 import { followRoutes } from "./routes/follows.js";
 import { notificationRoutes } from "./routes/notifications.js";
-import { messageRoutes } from './routes/messages.js';
+import { messageRoutes } from "./routes/messages.js";
+import websocket from "@fastify/websocket";
 
 const app = Fastify({ logger: true });
 
@@ -28,15 +30,19 @@ const start = async () => {
       limits: { fileSize: 10 * 1024 * 1024 },
     });
 
+    await app.register(websocket);
+
     await app.register(authPlugin);
 
     await app.register(authRoutes, { prefix: "/api/auth" });
+
+    await app.register(wsRoutes, { prefix: "/api" });
 
     await app.register(postRoutes, { prefix: "/api/posts" });
 
     await app.register(userRoutes, { prefix: "/api/users" });
 
-    await app.register(messageRoutes, { prefix: '/api/messages' });
+    await app.register(messageRoutes, { prefix: "/api/messages" });
 
     await app.register(notificationRoutes, { prefix: "/api/notifications" });
 
