@@ -16,7 +16,7 @@ import {
   Title,
   Popover,
   FileButton,
-  useMantineColorScheme, // <-- добавили хук темы
+  useMantineColorScheme,
 } from "@mantine/core";
 import {
   IconInfoCircle,
@@ -72,7 +72,6 @@ export default function Chat() {
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Получаем текущую тему (светлая/тёмная)
   const { colorScheme } = useMantineColorScheme();
   const isDark = colorScheme === "dark";
 
@@ -125,11 +124,17 @@ export default function Chat() {
 
   const { user, messages } = data;
 
+  // Цвета как в WhatsApp/Telegram для светлой и темной темы
+  const chatBg = isDark ? "var(--mantine-color-dark-8)" : "#efeae2"; // Классический фон чата
+  const myBubbleBg = isDark ? "var(--mantine-color-blue-6)" : "#d9fdd3"; // Зеленый для своих
+  const otherBubbleBg = isDark ? "var(--mantine-color-dark-6)" : "#ffffff"; // Белый для чужих
+  const textColor = isDark ? "var(--mantine-color-white)" : "#000000";
+
   return (
     <Container size="sm" py="md">
-      <Stack gap="md" style={{ height: "calc(100vh - 100px)" }}>
+      <Stack gap="sm" style={{ height: "calc(100vh - 100px)" }}>
         {/* Шапка чата */}
-        <Paper withBorder p="sm" radius="md">
+        <Paper withBorder p="sm" radius="md" shadow="sm">
           <Group justify="space-between">
             <Group>
               <ActionIcon variant="subtle" onClick={() => navigate("/dialogs")}>
@@ -148,207 +153,239 @@ export default function Chat() {
           </Group>
         </Paper>
 
-        {/* Сообщения */}
-        <Box
-          ref={scrollRef}
+        {/* Основное окно чата (объединяет сообщения и поле ввода) */}
+        <Paper
+          withBorder
+          radius="md"
+          shadow="sm"
           style={{
             flex: 1,
-            overflowY: "auto",
             display: "flex",
             flexDirection: "column",
-            gap: 8,
-            paddingRight: 8,
-            backgroundColor: isDark ? "var(--mantine-color-dark-8)" : "#F0F0F0",
+            overflow: "hidden",
           }}
         >
-          {messages.length === 0 ? (
-            <Text c="dimmed" ta="center" mt="xl">
-              Начните разговор первым 👋
-            </Text>
-          ) : (
-            messages.map((msg, index) => {
-              const isMine = msg.senderId === currentUser?.id;
-              const currentDate = new Date(msg.createdAt).toDateString();
-              const prevDate =
-                index > 0
-                  ? new Date(messages[index - 1].createdAt).toDateString()
-                  : null;
-              const showDateDivider = currentDate !== prevDate;
+          {/* Область сообщений */}
+          <Box
+            ref={scrollRef}
+            style={{
+              flex: 1,
+              overflowY: "auto",
+              backgroundColor: chatBg,
+              padding: "16px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+            }}
+          >
+            {messages.length === 0 ? (
+              <Text c="dimmed" ta="center" mt="xl">
+                Начните разговор первым 👋
+              </Text>
+            ) : (
+              messages.map((msg, index) => {
+                const isMine = msg.senderId === currentUser?.id;
+                const currentDate = new Date(msg.createdAt).toDateString();
+                const prevDate =
+                  index > 0
+                    ? new Date(messages[index - 1].createdAt).toDateString()
+                    : null;
+                const showDateDivider = currentDate !== prevDate;
 
-              return (
-                <div
-                  key={msg.id}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: isMine ? "flex-end" : "flex-start",
-                    gap: 4,
-                  }}
-                >
-                  {showDateDivider && (
-                    <div
-                      style={{
-                        textAlign: "center",
-                        width: "100%",
-                        margin: "12px 0",
-                      }}
-                    >
-                      <Text size="xs" c="dimmed" fw={500}>
-                        {formatDateLabel(msg.createdAt)}
-                      </Text>
-                    </div>
-                  )}
-
-                  <Paper
-                    p="sm"
-                    radius="md"
+                return (
+                  <div
+                    key={msg.id}
                     style={{
-                      maxWidth: "75%",
-                      // Адаптивные цвета для пузырей сообщений
-                      backgroundColor: isMine
-                        ? isDark
-                          ? "var(--mantine-color-blue-6)"
-                          : "#E1FFC7" // Светло-зеленый для своих
-                        : isDark
-                          ? "var(--mantine-color-dark-6)"
-                          : "#FFFFFF", // Белый для входящих
-                      color: isDark ? "var(--mantine-color-white)" : "#000000", // Черный текст в светлой теме
-                      borderBottomRightRadius: isMine ? 4 : undefined,
-                      borderBottomLeftRadius: !isMine ? 4 : undefined,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: isMine ? "flex-end" : "flex-start",
+                      gap: 4,
                     }}
                   >
-                    {msg.text && (
-                      <Text
-                        size="sm"
+                    {showDateDivider && (
+                      <div
                         style={{
-                          whiteSpace: "pre-wrap",
-                          wordBreak: "break-word",
+                          textAlign: "center",
+                          width: "100%",
+                          margin: "12px 0",
                         }}
                       >
-                        {msg.text}
-                      </Text>
+                        <Paper
+                          px="sm"
+                          py={2}
+                          radius="xl"
+                          style={{
+                            display: "inline-block",
+                            backgroundColor: isDark
+                              ? "rgba(255,255,255,0.1)"
+                              : "rgba(0,0,0,0.05)",
+                          }}
+                        >
+                          <Text size="xs" c="dimmed" fw={500}>
+                            {formatDateLabel(msg.createdAt)}
+                          </Text>
+                        </Paper>
+                      </div>
                     )}
 
-                    {/* Отображение файла, если он есть */}
-                    {msg.fileUrl && (
-                      <Paper
-                        withBorder
-                        p="xs"
-                        radius="sm"
-                        mt={msg.text ? "xs" : 0}
-                        style={{
-                          // Адаптивный фон для блока файла
-                          backgroundColor: isDark
-                            ? "rgba(0,0,0,0.15)"
-                            : isMine
-                              ? "rgba(0,0,0,0.05)"
-                              : "rgba(0,0,0,0.03)", // Легкий темный фон для файла
-                        }}
-                      >
-                        <Group gap="xs" wrap="nowrap">
-                          <IconFile size={20} />
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            {/* Убрали c="white", теперь цвет наследуется от темы */}
-                            <Text size="sm" truncate c="inherit">
-                              {msg.fileName}
-                            </Text>
-                            {msg.fileSize && (
-                              <Text size="xs" c="dimmed">
-                                {formatFileSize(msg.fileSize)}
-                              </Text>
-                            )}
-                          </div>
-                          <ActionIcon
-                            component="a"
-                            href={msg.fileUrl}
-                            download={msg.fileName}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            variant="subtle"
-                            color="gray"
-                          >
-                            <IconDownload size={16} />
-                          </ActionIcon>
-                        </Group>
-                      </Paper>
-                    )}
-
-                    <Text
-                      size="10px"
-                      // Адаптивный цвет времени
-                      c={isDark ? "dimmed" : isMine ? "green.8" : "gray.6"}
-                      ta="right"
-                      mt={4}
+                    <Paper
+                      p="sm"
+                      radius="md"
+                      style={{
+                        maxWidth: "85%",
+                        backgroundColor: isMine ? myBubbleBg : otherBubbleBg,
+                        color: textColor,
+                        boxShadow: isDark
+                          ? "none"
+                          : "0 1px 2px rgba(0,0,0,0.1)",
+                        // Оставляем "хвостик" только с одной стороны
+                        borderBottomRightRadius: isMine ? 4 : undefined,
+                        borderBottomLeftRadius: !isMine ? 4 : undefined,
+                      }}
                     >
-                      {new Date(msg.createdAt).toLocaleTimeString("ru-RU", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </Text>
-                  </Paper>
-                </div>
-              );
-            })
-          )}
-        </Box>
+                      {msg.text && (
+                        <Text
+                          size="sm"
+                          style={{
+                            whiteSpace: "pre-wrap",
+                            wordBreak: "break-word",
+                          }}
+                        >
+                          {msg.text}
+                        </Text>
+                      )}
 
-        {/* Поле ввода */}
-        <Group gap="xs" wrap="nowrap">
-          <Popover
-            opened={emojiPickerOpen}
-            onChange={setEmojiPickerOpen}
-            position="top-start"
-            shadow="md"
-          >
-            <Popover.Target>
-              <ActionIcon
-                variant="subtle"
-                size="lg"
-                onClick={() => setEmojiPickerOpen((o) => !o)}
-              >
-                <IconMoodSmile size={20} />
-              </ActionIcon>
-            </Popover.Target>
-            <Popover.Dropdown p={0}>
-              <EmojiPicker
-                onEmojiClick={(emojiData) => {
-                  setText((prev) => prev + emojiData.emoji);
-                  setEmojiPickerOpen(false);
-                }}
-              />
-            </Popover.Dropdown>
-          </Popover>
+                      {/* Отображение файла */}
+                      {msg.fileUrl && (
+                        <Paper
+                          withBorder
+                          p="xs"
+                          radius="sm"
+                          mt={msg.text ? "xs" : 0}
+                          style={{
+                            backgroundColor: isMine
+                              ? isDark
+                                ? "rgba(0,0,0,0.2)"
+                                : "rgba(255,255,255,0.5)"
+                              : isDark
+                                ? "rgba(0,0,0,0.2)"
+                                : "rgba(0,0,0,0.03)",
+                          }}
+                        >
+                          <Group gap="xs" wrap="nowrap">
+                            <IconFile size={24} />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <Text size="sm" truncate fw={500}>
+                                {msg.fileName}
+                              </Text>
+                              {msg.fileSize && (
+                                <Text size="xs" c="dimmed">
+                                  {formatFileSize(msg.fileSize)}
+                                </Text>
+                              )}
+                            </div>
+                            <ActionIcon
+                              component="a"
+                              href={msg.fileUrl}
+                              download={msg.fileName}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              variant="subtle"
+                              color="gray"
+                            >
+                              <IconDownload size={18} />
+                            </ActionIcon>
+                          </Group>
+                        </Paper>
+                      )}
 
-          <FileButton onChange={handleFileSelect}>
-            {(props) => (
-              <ActionIcon
-                {...props}
-                variant="subtle"
-                size="lg"
-                loading={isUploading}
-              >
-                <IconPaperclip size={20} />
-              </ActionIcon>
+                      <Text
+                        size="10px"
+                        c={isMine ? (isDark ? "blue.1" : "green.9") : "dimmed"}
+                        ta="right"
+                        mt={4}
+                      >
+                        {new Date(msg.createdAt).toLocaleTimeString("ru-RU", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </Text>
+                    </Paper>
+                  </div>
+                );
+              })
             )}
-          </FileButton>
+          </Box>
 
-          <TextInput
-            placeholder="Введите сообщение..."
-            style={{ flex: 1 }}
-            value={text}
-            onChange={(e) => setText(e.currentTarget.value)}
-            onKeyDown={handleKeyDown}
-          />
-          <ActionIcon
-            size="lg"
-            variant="filled"
-            onClick={handleSend}
-            loading={sendMessage.isPending}
-            disabled={!text.trim()}
+          {/* Поле ввода (теперь прикреплено к низу окна чата) */}
+          <Box
+            p="sm"
+            style={{
+              borderTop: isDark
+                ? "1px solid var(--mantine-color-dark-5)"
+                : "1px solid #e0e0e0",
+            }}
           >
-            <IconSend size={18} />
-          </ActionIcon>
-        </Group>
+            <Group gap="xs" wrap="nowrap">
+              <Popover
+                opened={emojiPickerOpen}
+                onChange={setEmojiPickerOpen}
+                position="top-start"
+                shadow="md"
+              >
+                <Popover.Target>
+                  <ActionIcon
+                    variant="subtle"
+                    size="lg"
+                    onClick={() => setEmojiPickerOpen((o) => !o)}
+                  >
+                    <IconMoodSmile size={20} />
+                  </ActionIcon>
+                </Popover.Target>
+                <Popover.Dropdown p={0}>
+                  <EmojiPicker
+                    onEmojiClick={(emojiData) => {
+                      setText((prev) => prev + emojiData.emoji);
+                      setEmojiPickerOpen(false);
+                    }}
+                  />
+                </Popover.Dropdown>
+              </Popover>
+
+              <FileButton onChange={handleFileSelect}>
+                {(props) => (
+                  <ActionIcon
+                    {...props}
+                    variant="subtle"
+                    size="lg"
+                    loading={isUploading}
+                  >
+                    <IconPaperclip size={20} />
+                  </ActionIcon>
+                )}
+              </FileButton>
+
+              <TextInput
+                placeholder="Введите сообщение..."
+                style={{ flex: 1 }}
+                value={text}
+                onChange={(e) => setText(e.currentTarget.value)}
+                onKeyDown={handleKeyDown}
+                variant="default"
+              />
+
+              <ActionIcon
+                size="lg"
+                variant="filled"
+                onClick={handleSend}
+                loading={sendMessage.isPending}
+                disabled={!text.trim()}
+              >
+                <IconSend size={18} />
+              </ActionIcon>
+            </Group>
+          </Box>
+        </Paper>
       </Stack>
     </Container>
   );
