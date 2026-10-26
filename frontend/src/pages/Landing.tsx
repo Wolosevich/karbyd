@@ -16,7 +16,6 @@ import { IconPhoto, IconUsers, IconBell, IconHeart } from "@tabler/icons-react";
 import classes from "./Landing.module.css";
 
 export default function Landing() {
-  // Получаем текущую тему, чтобы адаптировать цвета
   const { colorScheme } = useMantineColorScheme();
   const isDark = colorScheme === "dark";
 
@@ -46,7 +45,6 @@ export default function Landing() {
     },
   ];
 
-  // Общие стили для стеклянных карточек
   const glassStyle = {
     background: isDark ? "rgba(30, 39, 50, 0.5)" : "rgba(255, 255, 255, 0.6)",
     backdropFilter: "blur(16px)",
@@ -54,29 +52,31 @@ export default function Landing() {
     border: isDark
       ? "1px solid rgba(255, 255, 255, 0.1)"
       : "1px solid rgba(255, 255, 255, 0.5)",
+    height: "100%", // Чтобы все карточки в ряду были одинаковой высоты
   };
 
   return (
-    // Общий градиентный фон для всей страницы (как на логине)
     <Box
       style={{
         minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
         background: isDark
           ? "linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)"
           : "linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)",
       }}
     >
       {/* Верхняя часть (Hero) */}
-      <Box py={100}>
+      <Box style={{ flex: 1 }} py={80}>
         <Container size="md">
           <Stack align="center" gap="lg">
             <Title
               order={1}
-              c="var(--mantine-color-text)" // Белый текст для тёмной темы
+              c="var(--mantine-color-text)"
               style={{
-                fontSize: "clamp(2.5rem, 8vw, 4.5rem)",
+                fontSize: "clamp(2rem, 6vw, 4rem)",
                 fontWeight: 900,
-                lineHeight: 1.1,
+                lineHeight: 1.2,
                 textAlign: "center",
               }}
             >
@@ -87,7 +87,7 @@ export default function Landing() {
                 gradient={{ from: "blue.4", to: "teal.4", deg: 45 }}
                 inherit
               >
-                KaRByD
+                karbyd
               </Text>
             </Title>
 
@@ -113,12 +113,12 @@ export default function Landing() {
       </Box>
 
       {/* Блок с фичами */}
-      <Box py={80}>
+      <Box py={60}>
         <Container size="md">
-          <Title order={2} ta="center" mb={50} c="var(--mantine-color-text)">
+          <Title order={2} ta="center" mb={40} c="var(--mantine-color-text)">
             Всё, что нужно для общения
           </Title>
-          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xl">
+          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
             {features.map((f, i) => (
               <Paper
                 key={i}
@@ -127,10 +127,13 @@ export default function Landing() {
                 className={classes.featureCard}
                 style={glassStyle}
               >
-                <Group mb="md">
+                <Group mb="sm">
                   {f.icon}
-                  <Text c="dimmed">{f.description}</Text>
+                  <Text fw={700} size="lg" c="var(--mantine-color-text)">
+                    {f.title}
+                  </Text>
                 </Group>
+                {/* Текст описания (выводится ровно один раз) */}
                 <Text c="dimmed">{f.description}</Text>
               </Paper>
             ))}
@@ -139,14 +142,16 @@ export default function Landing() {
       </Box>
 
       {/* Подвал */}
-      <Center
+      <Box
         py="xl"
         style={{ borderTop: "1px solid var(--mantine-color-default-border)" }}
       >
-        <Text c="dimmed" size="sm">
-          © {new Date().getFullYear()} KaRByD. Сделано для друзей.
-        </Text>
-      </Center>
+        <Center>
+          <Text c="dimmed" size="sm">
+            © {new Date().getFullYear()} karbyd. Сделано с ❤️ для портфолио.
+          </Text>
+        </Center>
+      </Box>
     </Box>
   );
 }
