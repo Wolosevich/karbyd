@@ -87,7 +87,7 @@ export default function Landing() {
                 gradient={{ from: "blue.4", to: "teal.4", deg: 45 }}
                 inherit
               >
-                karbyd
+                KaRByD
               </Text>
             </Title>
 
@@ -148,7 +148,7 @@ export default function Landing() {
       >
         <Center>
           <Text c="dimmed" size="sm">
-            © {new Date().getFullYear()} karbyd. Сделано с ❤️ для портфолио.
+            © {new Date().getFullYear()} KaRByD. Move out, rookies!.
           </Text>
         </Center>
       </Box>
