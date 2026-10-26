@@ -45,9 +45,8 @@ export default function Landing() {
       {/* Верхняя часть (Hero) */}
       <Box
         style={{
-          background:
-            "linear-gradient(180deg, var(--mantine-color-dark-8) 0%, var(--mantine-color-dark-9) 100%)",
-          borderBottom: "1px solid var(--mantine-color-dark-6)",
+          backgroundColor: "var(--mantine-color-body)", // Адаптивный фон
+          borderBottom: "1px solid var(--mantine-color-default-border)",
           paddingTop: "80px",
           paddingBottom: "80px",
         }}
@@ -56,6 +55,7 @@ export default function Landing() {
           <Stack align="center" gap="lg">
             <Title
               order={1}
+              c="var(--mantine-color-text)" // Адаптивный цвет текста
               style={{
                 fontSize: "clamp(2.5rem, 8vw, 4.5rem)",
                 fontWeight: 900,
@@ -75,8 +75,8 @@ export default function Landing() {
             </Title>
 
             <Text size="xl" c="dimmed" ta="center" maw={600}>
-              Добро пожаловать на борт, дорогие друзья!
-              Частная соцсеть любителей активного отдыха и рыбалки
+              Мини-социальная сеть для общения, обмена фотографиями и новых
+              знакомств. Присоединяйся к сообществу!
             </Text>
 
             <Group mt="xl">
@@ -96,20 +96,14 @@ export default function Landing() {
       </Box>
 
       {/* Блок с фичами */}
-      <Box py={80} style={{ backgroundColor: "var(--mantine-color-dark-9)" }}>
+      <Box py={80}>
         <Container size="md">
           <Title order={2} ta="center" mb="xl">
             Всё, что нужно для общения
           </Title>
           <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
             {features.map((f, i) => (
-              <Paper
-                key={i}
-                p="xl"
-                radius="md"
-                withBorder
-                style={{ backgroundColor: "var(--mantine-color-dark-8)" }}
-              >
+              <Paper key={i} p="xl" radius="md">
                 <Group mb="sm">
                   {f.icon}
                   <Text fw={600} size="lg">
@@ -126,10 +120,10 @@ export default function Landing() {
       {/* Подвал */}
       <Center
         py="xl"
-        style={{ borderTop: "1px solid var(--mantine-color-dark-6)" }}
+        style={{ borderTop: "1px solid var(--mantine-color-default-border)" }}
       >
         <Text c="dimmed" size="sm">
-          © {new Date().getFullYear()} KARBYD. Сделано для друзей.
+          © {new Date().getFullYear()} karbyd. Сделано с ❤️ для портфолио.
         </Text>
       </Center>
     </Box>

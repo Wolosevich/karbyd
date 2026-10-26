@@ -110,7 +110,7 @@ export default function Notifications() {
                 cursor: "pointer",
                 backgroundColor: n.read
                   ? undefined
-                  : "var(--mantine-color-dark-6)",
+                  : "var(--mantine-color-blue-light)",
               }}
               onClick={() =>
                 n.type === "follow"

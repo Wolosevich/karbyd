@@ -18,8 +18,8 @@ import {
   IconUserPlus,
   IconUserMinus,
 } from "@tabler/icons-react";
-import { Link } from 'react-router-dom';
-import { IconMessage } from '@tabler/icons-react';
+import { Link } from "react-router-dom";
+import { IconMessage } from "@tabler/icons-react";
 import PostCard from "../components/PostCard";
 import EditProfileModal from "../components/EditProfileModal";
 import SEO from "../components/SEO";
@@ -49,7 +49,14 @@ function ProfileSkeleton() {
         <Divider />
         {/* Скелетоны для постов */}
         {[1, 2, 3].map((i) => (
-          <div key={i} style={{ border: '1px solid var(--mantine-color-dark-4)', borderRadius: 8, padding: 16 }}>
+          <div
+            key={i}
+            style={{
+              border: "1px solid var(--mantine-color-default-border)",
+              borderRadius: 8,
+              padding: 16,
+            }}
+          >
             <Group>
               <Skeleton height={40} circle />
               <div>
@@ -149,14 +156,18 @@ export default function Profile() {
                 Написать
               </Button>
               <Button
-                variant={isFollowing ? 'default' : 'filled'}
+                variant={isFollowing ? "default" : "filled"}
                 leftSection={
-                  isFollowing ? <IconUserMinus size={16} /> : <IconUserPlus size={16} />
+                  isFollowing ? (
+                    <IconUserMinus size={16} />
+                  ) : (
+                    <IconUserPlus size={16} />
+                  )
                 }
                 onClick={() => toggleFollow.mutate()}
                 loading={toggleFollow.isPending}
               >
-                {isFollowing ? 'Отписаться' : 'Подписаться'}
+                {isFollowing ? "Отписаться" : "Подписаться"}
               </Button>
             </Group>
           )}
