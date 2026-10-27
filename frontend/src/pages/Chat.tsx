@@ -11,7 +11,7 @@ import {
   Center,
   Alert,
   ActionIcon,
-  TextInput,
+  Textarea,
   Box,
   Title,
   Popover,
@@ -402,13 +402,16 @@ export default function Chat() {
                 )}
               </FileButton>
 
-              <TextInput
+              <Textarea
                 placeholder="Введите сообщение..."
                 style={{ flex: 1 }}
                 value={text}
                 onChange={(e) => setText(e.currentTarget.value)}
                 onKeyDown={handleKeyDown}
                 variant="default"
+                autosize
+                minRows={3}
+                maxRows={4}
               />
 
               <ActionIcon
