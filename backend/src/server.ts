@@ -2,6 +2,7 @@ import "dotenv/config";
 import Fastify from "fastify";
 import cookie from "@fastify/cookie";
 import cors from "@fastify/cors";
+import rateLimit from "@fastify/rate-limit";
 import authPlugin from "./plugins/auth.js";
 import { authRoutes } from "./routes/auth.js";
 import { wsRoutes } from "./routes/ws.js";
@@ -28,6 +29,16 @@ const start = async () => {
 
     await app.register(multipart, {
       limits: { fileSize: 10 * 1024 * 1024 },
+    });
+    await app.register(rateLimit, {
+      global: true, // Включаем лимиты для всех маршрутов по умолчанию
+      max: 100, // Максимум 100 запросов
+      timeWindow: "1 minute", // За одну минуту с одного IP
+      errorResponseBuilder: () => ({
+        statusCode: 429,
+        error: "Too Many Requests",
+        message: "Слишком много запросов. Пожалуйста, подождите минуту.",
+      }),
     });
 
     await app.register(websocket);
