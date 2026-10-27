@@ -10,13 +10,24 @@ import PostDetail from "./pages/PostDetail";
 import Notifications from "./pages/Notifications";
 import Navbar from "./components/Navbar";
 import { useAuth } from "./hooks/useAuth";
-import Dialogs from './pages/Dialogs';
-import Chat from './pages/Chat';
-import Saved from './pages/Saved';
-import MobileNavbar from './components/MobileNavbar';
+import Dialogs from "./pages/Dialogs";
+import Chat from "./pages/Chat";
+import Saved from "./pages/Saved";
+import MobileNavbar from "./components/MobileNavbar";
+import { useQueryClient } from "@tanstack/react-query";
+import { useWebSocket } from "./hooks/useWebSocket";
 
 function App() {
   const { user, isLoading } = useAuth();
+  const queryClient = useQueryClient();
+  const token = localStorage.getItem("token");
+
+  useWebSocket(token || undefined, (payload) => {
+    if (payload.event === "new_notification") {
+      // Обновляем кэш уведомлений, чтобы колокольчик загорелся
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    }
+  });
 
   if (isLoading) {
     return (
@@ -39,12 +50,11 @@ function App() {
 
   // Если ЗАЛОГИНЕН
   return (
-
     <AppShell header={{ height: 60 }} padding="md">
       <AppShell.Header>
         <Navbar />
       </AppShell.Header>
-      <AppShell.Main style={{ paddingBottom: '80px' }}>
+      <AppShell.Main style={{ paddingBottom: "80px" }}>
         <Routes>
           <Route path="/" element={<Feed />} />
           <Route path="/users" element={<Users />} />
@@ -62,7 +72,6 @@ function App() {
       </AppShell.Main>
     </AppShell>
   );
-
 }
 
 export default App;

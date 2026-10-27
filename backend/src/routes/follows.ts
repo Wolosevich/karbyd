@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { prisma } from "../lib/prisma.js";
+import { sendToUser } from "../lib/ws-manager.js";
 
 export async function followRoutes(app: FastifyInstance) {
   // POST /api/users/:username/follow — подписаться / отписаться
@@ -59,7 +60,7 @@ export async function followRoutes(app: FastifyInstance) {
           type: "follow",
         },
       });
-
+      sendToUser(target.id, "new_notification", {});
       return { following: true };
     },
   );

@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { prisma } from "../lib/prisma.js";
 import { createPostSchema, createCommentSchema } from "../schemas/post.js";
+import { sendToUser } from "../lib/ws-manager.js";
 
 export async function postRoutes(app: FastifyInstance) {
   // GET /api/posts — лента (публичная, с пагинацией)
@@ -84,6 +85,7 @@ export async function postRoutes(app: FastifyInstance) {
     });
     // --- ЛОГИКА УПОМИНАНИЙ ---
     // Ищем все @username в тексте (игнорируем email-ы, поэтому проверяем, что перед @ нет букв/цифр)
+    // --- ЛОГИКА УПОМИНАНИЙ ---
     const mentionRegex = /(?<!\w)@([a-zA-Z0-9_]+)/g;
     const mentionedUsernames = Array.from(
       text.matchAll(mentionRegex),
@@ -91,14 +93,12 @@ export async function postRoutes(app: FastifyInstance) {
     );
 
     if (mentionedUsernames.length > 0) {
-      // Ищем этих пользователей в базе
       const mentionedUsers = await prisma.user.findMany({
         where: { username: { in: mentionedUsernames } },
         select: { id: true },
       });
 
       for (const mUser of mentionedUsers) {
-        // Не отправляем уведомление, если упомянули сами себя
         if (mUser.id !== req.user.userId) {
           await prisma.notification.create({
             data: {
@@ -108,9 +108,11 @@ export async function postRoutes(app: FastifyInstance) {
               postId: post.id,
             },
           });
+          sendToUser(mUser.id, "new_notification", {}); // <-- ОТПРАВЛЯЕМ ТОМУ, КОГО УПОМЯНУЛИ
         }
       }
     }
+    // --- КОНЕЦ ЛОГИКИ УПОМИНАНИЙ ---
     // --- КОНЕЦ ЛОГИКИ УПОМИНАНИЙ ---
 
     return reply.code(201).send(post);
@@ -302,6 +304,7 @@ export async function postRoutes(app: FastifyInstance) {
             postId: postId,
           },
         });
+        sendToUser(post.authorId, "new_notification", {});
       }
 
       return { liked: true };
@@ -347,7 +350,35 @@ export async function postRoutes(app: FastifyInstance) {
             postId: postId,
           },
         });
+        sendToUser(post.authorId, "new_notification", {});
       }
+      const mentionRegex = /(?<!\w)@([a-zA-Z0-9_]+)/g;
+      const mentionedUsernames = Array.from(
+        parsed.data.text.matchAll(mentionRegex),
+        (m) => m[1],
+      );
+
+      if (mentionedUsernames.length > 0) {
+        const mentionedUsers = await prisma.user.findMany({
+          where: { username: { in: mentionedUsernames } },
+          select: { id: true },
+        });
+
+        for (const mUser of mentionedUsers) {
+          if (mUser.id !== req.user.userId) {
+            await prisma.notification.create({
+              data: {
+                userId: mUser.id,
+                actorId: req.user.userId,
+                type: "mention",
+                postId: postId,
+              },
+            });
+            sendToUser(mUser.id, "new_notification", {});
+          }
+        }
+      }
+      // --- КОНЕЦ ЛОГИКИ УПОМИНАНИЙ ---
 
       return reply.code(201).send(comment);
     },
