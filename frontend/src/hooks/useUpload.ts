@@ -1,4 +1,5 @@
 import { useState } from "react";
+import imageCompression from "browser-image-compression";
 import { notifications } from "@mantine/notifications";
 import { uploadApi } from "../api/upload";
 
@@ -17,11 +18,12 @@ export function useUpload() {
       return null;
     }
 
-    const maxSize = 5 * 1024 * 1024; // 5 МБ
+    // Разрешаем загружать оригиналы до 10 МБ (мы их все равно сожмем)
+    const maxSize = 10 * 1024 * 1024;
     if (file.size > maxSize) {
       notifications.show({
         title: "Ошибка",
-        message: "Файл слишком большой (максимум 5 МБ)",
+        message: "Файл слишком большой (максимум 10 МБ)",
         color: "red",
       });
       return null;
@@ -29,7 +31,30 @@ export function useUpload() {
 
     setIsUploading(true);
     try {
-      const { url } = await uploadApi.uploadImage(file);
+      // --- ЛОГИКА СЖАТИЯ ---
+      const options = {
+        maxSizeMB: 1, // Сжимаем до 1 МБ
+        maxWidthOrHeight: 1920, // Максимальная ширина/высота 1920px
+        useWebWorker: true, // Используем Web Worker, чтобы интерфейс не зависал
+      };
+
+      let fileToUpload = file;
+
+      // Сжимаем только картинки, GIF оставляем как есть (чтобы не сломать анимацию)
+      if (file.type !== "image/gif") {
+        try {
+          fileToUpload = await imageCompression(file, options);
+          console.log(
+            `Сжатие: было ${(file.size / 1024 / 1024).toFixed(2)} МБ, стало ${(fileToUpload.size / 1024 / 1024).toFixed(2)} МБ`,
+          );
+        } catch (error) {
+          console.error("Ошибка сжатия, отправляем оригинал:", error);
+          // Если сжатие упало, отправляем оригинал
+        }
+      }
+      // --- КОНЕЦ ЛОГИКИ СЖАТИЯ ---
+
+      const { url } = await uploadApi.uploadImage(fileToUpload);
       return url;
     } catch {
       notifications.show({
