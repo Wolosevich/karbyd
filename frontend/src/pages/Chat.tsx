@@ -159,8 +159,19 @@ export default function Chat() {
   const textColor = isDark ? "var(--mantine-color-white)" : "#000000";
 
   return (
-    <Container size="sm" py="md">
-      <Stack gap="sm" style={{ height: "calc(100vh - 100px)" }}>
+    <Container
+      size="sm"
+      py={0}
+      style={{
+        height: "calc(100dvh - 140px)",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <Stack
+        gap="sm"
+        style={{ flex: 1, overflow: "hidden", paddingTop: "10px" }}
+      >
         {/* Шапка чата */}
         <Paper withBorder p="sm" radius="md" shadow="sm">
           <Group justify="space-between">
