@@ -58,12 +58,8 @@ export default function Landing() {
   return (
     <Box
       style={{
-        minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
-        background: isDark
-          ? "linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)"
-          : "linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)",
       }}
     >
       {/* Верхняя часть (Hero) */}

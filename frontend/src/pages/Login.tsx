@@ -67,13 +67,9 @@ export default function Login() {
     // Фон с красивым градиентом, который меняется в зависимости от темы
     <Box
       style={{
-        minHeight: "100vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: isDark
-          ? "linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)" // Темный градиент
-          : "linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)", // Светлый градиент
         padding: "20px",
       }}
     >
