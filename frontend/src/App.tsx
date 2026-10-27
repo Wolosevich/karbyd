@@ -63,7 +63,7 @@ function App() {
 
   // Если ЗАЛОГИНЕН
   return (
-    <AppShell header={{ height: 60 }} padding={{ base: "xs", sm: "md" }}>
+    <AppShell header={{ height: 60 }} padding={{ base: 0, sm: "md" }}>
       <AppShell.Header
         style={{
           backgroundColor: isDark
@@ -78,7 +78,7 @@ function App() {
       </AppShell.Header>
       <AppShell.Main
         style={{
-          paddingBottom: "80px",
+          paddingBottom: "60px",
           background: gradientBg,
           minHeight: "100vh",
         }}
