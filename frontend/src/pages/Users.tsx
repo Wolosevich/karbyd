@@ -59,7 +59,11 @@ export default function Users() {
   };
 
   return (
-    <Container size="sm" py="xl">
+    <Container
+      size="sm"
+      py={{ base: "sm", sm: "xl" }}
+      px={{ base: "xs", sm: "md" }}
+    >
       <Stack gap="md">
         <Group gap="xs">
           <IconUsers size={28} color="var(--mantine-color-text)" />

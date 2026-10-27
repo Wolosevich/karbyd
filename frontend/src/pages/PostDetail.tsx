@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useState } from 'react';
+import { useState } from "react";
 import { renderTextWithLinks } from "../utils/renderText";
 import {
   Container,
@@ -15,7 +15,12 @@ import {
   ActionIcon,
   Button,
 } from "@mantine/core";
-import { IconInfoCircle, IconHeart, IconArrowLeft, IconCornerDownRight } from "@tabler/icons-react";
+import {
+  IconInfoCircle,
+  IconHeart,
+  IconArrowLeft,
+  IconCornerDownRight,
+} from "@tabler/icons-react";
 import { useNavigate, Link } from "react-router-dom";
 import CommentForm from "../components/CommentForm";
 import { usePost, useLikePost } from "../hooks/usePosts";
@@ -48,7 +53,11 @@ export default function PostDetail() {
 
   if (isError || !post) {
     return (
-      <Container size="sm" py="xl">
+      <Container
+        size="sm"
+        py={{ base: "sm", sm: "xl" }}
+        px={{ base: "xs", sm: "md" }}
+      >
         <Alert color="red" icon={<IconInfoCircle size={16} />} title="Ошибка">
           Пост не найден
         </Alert>
@@ -119,7 +128,8 @@ export default function PostDetail() {
             .filter((c) => !c.parentId)
             .map((comment) => {
               // 2. Ищем ответы, которые относятся именно к этому комментарию
-              const replies = post.comments?.filter((c) => c.parentId === comment.id) || [];
+              const replies =
+                post.comments?.filter((c) => c.parentId === comment.id) || [];
 
               return (
                 <div key={comment.id} style={{ marginBottom: 8 }}>
@@ -133,7 +143,7 @@ export default function PostDetail() {
                           size="sm"
                           component={Link}
                           to={`/profile/${comment.author.username}`}
-                          style={{ cursor: 'pointer' }}
+                          style={{ cursor: "pointer" }}
                         >
                           {comment.author.username[0].toUpperCase()}
                         </Avatar>
@@ -143,7 +153,7 @@ export default function PostDetail() {
                             to={`/profile/${comment.author.username}`}
                             fw={500}
                             size="sm"
-                            style={{ textDecoration: 'none' }}
+                            style={{ textDecoration: "none" }}
                             c="inherit"
                           >
                             {comment.author.username}
@@ -159,20 +169,32 @@ export default function PostDetail() {
                         variant="subtle"
                         size="compact-xs"
                         leftSection={<IconCornerDownRight size={14} />}
-                        onClick={() => setReplyingToId(replyingToId === comment.id ? null : comment.id)}
+                        onClick={() =>
+                          setReplyingToId(
+                            replyingToId === comment.id ? null : comment.id,
+                          )
+                        }
                       >
                         Ответить
                       </Button>
                     </Group>
 
-                    <Text size="sm" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                    <Text
+                      size="sm"
+                      style={{
+                        whiteSpace: "pre-wrap",
+                        wordBreak: "break-word",
+                      }}
+                    >
                       {renderTextWithLinks(comment.text)}
                     </Text>
                   </Paper>
 
                   {/* Форма ответа (появляется при клике на "Ответить") */}
                   {replyingToId === comment.id && (
-                    <div style={{ marginLeft: 32, marginTop: 8, marginBottom: 16 }}>
+                    <div
+                      style={{ marginLeft: 32, marginTop: 8, marginBottom: 16 }}
+                    >
                       <CommentForm
                         postId={post.id}
                         parentId={comment.id}
@@ -183,7 +205,15 @@ export default function PostDetail() {
 
                   {/* Сами ответы (сдвинутые вправо) */}
                   {replies.length > 0 && (
-                    <div style={{ marginLeft: 32, marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div
+                      style={{
+                        marginLeft: 32,
+                        marginTop: 8,
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 8,
+                      }}
+                    >
                       {replies.map((reply) => (
                         <Paper key={reply.id} withBorder p="sm" radius="md">
                           <Group mb="xs">
@@ -193,7 +223,7 @@ export default function PostDetail() {
                               size="xs"
                               component={Link}
                               to={`/profile/${reply.author.username}`}
-                              style={{ cursor: 'pointer' }}
+                              style={{ cursor: "pointer" }}
                             >
                               {reply.author.username[0].toUpperCase()}
                             </Avatar>
@@ -202,7 +232,7 @@ export default function PostDetail() {
                               to={`/profile/${reply.author.username}`}
                               fw={500}
                               size="xs"
-                              style={{ textDecoration: 'none' }}
+                              style={{ textDecoration: "none" }}
                               c="inherit"
                             >
                               {reply.author.username}
@@ -211,7 +241,13 @@ export default function PostDetail() {
                               {formatDate(reply.createdAt)}
                             </Text>
                           </Group>
-                          <Text size="sm" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                          <Text
+                            size="sm"
+                            style={{
+                              whiteSpace: "pre-wrap",
+                              wordBreak: "break-word",
+                            }}
+                          >
                             {renderTextWithLinks(reply.text)}
                           </Text>
                         </Paper>

@@ -84,7 +84,11 @@ export default function Notifications() {
   };
 
   return (
-    <Container size="sm" py="xl">
+    <Container
+      size="sm"
+      py={{ base: "sm", sm: "xl" }}
+      px={{ base: "xs", sm: "md" }}
+    >
       <Stack gap="md">
         <Group gap="xs">
           <Title order={2}>Уведомления</Title>

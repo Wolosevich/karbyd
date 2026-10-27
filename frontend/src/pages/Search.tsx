@@ -44,7 +44,11 @@ export default function Search() {
   const posts = postsData?.items ?? [];
 
   return (
-    <Container size="sm" py="xl">
+    <Container
+      size="sm"
+      py={{ base: "sm", sm: "xl" }}
+      px={{ base: "xs", sm: "md" }}
+    >
       <Stack gap="md">
         <Title order={2}>Поиск</Title>
 

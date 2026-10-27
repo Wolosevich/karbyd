@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Container,
   Stack,
@@ -11,13 +11,13 @@ import {
   Paper,
   Group,
   Loader,
-} from '@mantine/core';
-import { useIntersection } from '@mantine/hooks';
-import { IconInfoCircle } from '@tabler/icons-react';
-import PostForm from '../components/PostForm';
-import PostCard from '../components/PostCard';
-import ScrollToTop from '../components/ScrollToTop';
-import { useFeed } from '../hooks/usePosts';
+} from "@mantine/core";
+import { useIntersection } from "@mantine/hooks";
+import { IconInfoCircle } from "@tabler/icons-react";
+import PostForm from "../components/PostForm";
+import PostCard from "../components/PostCard";
+import ScrollToTop from "../components/ScrollToTop";
+import { useFeed } from "../hooks/usePosts";
 
 // Компонент, который рисует серую карточку-заглушку
 function PostSkeleton() {
@@ -42,7 +42,7 @@ function PostSkeleton() {
 }
 
 export default function Feed() {
-  const [feedType, setFeedType] = useState<'all' | 'following'>('all');
+  const [feedType, setFeedType] = useState<"all" | "following">("all");
 
   const {
     data,
@@ -70,21 +70,25 @@ export default function Feed() {
   }, [entry?.isIntersecting, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
-    <Container size="sm" py="xl">
+    <Container
+      size="sm"
+      py={{ base: "sm", sm: "xl" }}
+      px={{ base: "xs", sm: "md" }}
+    >
       <Stack gap="md">
         <Title order={2}>Лента</Title>
 
         <SegmentedControl
           value={feedType}
-          onChange={(value) => setFeedType(value as 'all' | 'following')}
+          onChange={(value) => setFeedType(value as "all" | "following")}
           data={[
-            { label: 'Все посты', value: 'all' },
-            { label: 'Подписки', value: 'following' },
+            { label: "Все посты", value: "all" },
+            { label: "Подписки", value: "following" },
           ]}
           fullWidth
         />
 
-        {feedType === 'all' && <PostForm />}
+        {feedType === "all" && <PostForm />}
 
         {isLoading && (
           <Stack gap="md">
@@ -104,7 +108,7 @@ export default function Feed() {
           </Alert>
         )}
 
-        {!isLoading && posts.length === 0 && feedType === 'all' && (
+        {!isLoading && posts.length === 0 && feedType === "all" && (
           <Alert
             color="blue"
             icon={<IconInfoCircle size={16} />}
@@ -114,7 +118,7 @@ export default function Feed() {
           </Alert>
         )}
 
-        {!isLoading && posts.length === 0 && feedType === 'following' && (
+        {!isLoading && posts.length === 0 && feedType === "following" && (
           <Alert
             color="blue"
             icon={<IconInfoCircle size={16} />}
@@ -141,7 +145,6 @@ export default function Feed() {
             </Text>
           )}
         </div>
-
       </Stack>
 
       <ScrollToTop />

@@ -29,7 +29,11 @@ import { useToggleFollow } from "../hooks/useFollow";
 
 function ProfileSkeleton() {
   return (
-    <Container size="sm" py="xl">
+    <Container
+      size="sm"
+      py={{ base: "sm", sm: "xl" }}
+      px={{ base: "xs", sm: "md" }}
+    >
       <Stack gap="md">
         <Group justify="space-between" align="flex-start">
           <Group>
