@@ -7,7 +7,6 @@ import {
     Avatar,
     Text,
     Badge,
-    Button,
     ActionIcon,
     Alert,
     Loader,
