@@ -42,7 +42,14 @@ export async function authRoutes(app: FastifyInstance) {
 
       const user = await prisma.user.create({
         data: { email, username, password: hash },
-        select: { id: true, email: true, username: true, createdAt: true, role: true, banned: true },
+        select: {
+          id: true,
+          email: true,
+          username: true,
+          createdAt: true,
+          role: true,
+          banned: true,
+        },
       });
 
       const token = app.jwt.sign({ userId: user.id }, { expiresIn: "7d" });
@@ -92,7 +99,12 @@ export async function authRoutes(app: FastifyInstance) {
       if (!ok) {
         return reply.code(401).send({ error: "Неверный email или пароль" });
       }
-
+      // Проверяем, не забанен ли пользователь
+      if (user.banned) {
+        return reply.code(403).send({
+          error: "Ваш аккаунт заблокирован администратором.",
+        });
+      }
       const token = app.jwt.sign({ userId: user.id }, { expiresIn: "7d" });
 
       reply
@@ -104,7 +116,13 @@ export async function authRoutes(app: FastifyInstance) {
           maxAge: 60 * 60 * 24 * 7,
         })
         .send({
-          user: { id: user.id, email: user.email, username: user.username, role: user.role, banned: user.banned },
+          user: {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            role: user.role,
+            banned: user.banned,
+          },
           token,
         });
     },
@@ -140,6 +158,13 @@ export async function authRoutes(app: FastifyInstance) {
     });
 
     if (!user) return reply.code(404).send({ error: "Пользователь не найден" });
+    if (!user) return reply.code(404).send({ error: "Пользователь не найден" });
+
+    // Если пользователь забанен — не даем доступ
+    if (user.banned) {
+      return reply.code(403).send({ error: "Ваш аккаунт заблокирован." });
+    }
+
     return user;
   });
 }
