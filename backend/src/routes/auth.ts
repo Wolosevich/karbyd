@@ -129,7 +129,6 @@ export async function authRoutes(app: FastifyInstance) {
   );
 
   // POST /api/auth/logout — выход
-  // POST /api/auth/logout — выход
   app.post("/logout", async (_req, reply) => {
     reply
       .clearCookie("token", {
@@ -157,7 +156,6 @@ export async function authRoutes(app: FastifyInstance) {
       },
     });
 
-    if (!user) return reply.code(404).send({ error: "Пользователь не найден" });
     if (!user) return reply.code(404).send({ error: "Пользователь не найден" });
 
     // Если пользователь забанен — не даем доступ
