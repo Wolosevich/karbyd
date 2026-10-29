@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "../hooks/useAuth";
 import { renderTextWithLinks } from "../utils/renderText";
 import {
   Container,
@@ -20,10 +21,12 @@ import {
   IconHeart,
   IconArrowLeft,
   IconCornerDownRight,
+  IconTrash,
 } from "@tabler/icons-react";
 import { useNavigate, Link } from "react-router-dom";
 import CommentForm from "../components/CommentForm";
 import { usePost, useLikePost } from "../hooks/usePosts";
+import { useAdminDeleteComment } from "../hooks/useAdmin";
 
 function formatDate(dateString: string) {
   const date = new Date(dateString);
@@ -37,6 +40,9 @@ function formatDate(dateString: string) {
 }
 
 export default function PostDetail() {
+  const adminDeleteComment = useAdminDeleteComment();
+  const { user: currentUser } = useAuth();
+  const isAdmin = currentUser?.role === "admin";
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: post, isLoading, isError } = usePost(id || "");
@@ -177,6 +183,24 @@ export default function PostDetail() {
                       >
                         Ответить
                       </Button>
+                      {isAdmin && (
+                        <ActionIcon
+                          variant="subtle"
+                          color="red"
+                          size="sm"
+                          onClick={() => {
+                            if (window.confirm("Удалить этот комментарий?")) {
+                              adminDeleteComment.mutate(comment.id);
+                            }
+                          }}
+                          loading={
+                            adminDeleteComment.isPending &&
+                            adminDeleteComment.variables === comment.id
+                          }
+                        >
+                          <IconTrash size={14} />
+                        </ActionIcon>
+                      )}
                     </Group>
 
                     <Text
@@ -240,6 +264,24 @@ export default function PostDetail() {
                             <Text size="10px" c="dimmed">
                               {formatDate(reply.createdAt)}
                             </Text>
+                            {isAdmin && (
+                              <ActionIcon
+                                variant="subtle"
+                                color="red"
+                                size="xs"
+                                onClick={() => {
+                                  if (window.confirm("Удалить этот ответ?")) {
+                                    adminDeleteComment.mutate(reply.id);
+                                  }
+                                }}
+                                loading={
+                                  adminDeleteComment.isPending &&
+                                  adminDeleteComment.variables === reply.id
+                                }
+                              >
+                                <IconTrash size={12} />
+                              </ActionIcon>
+                            )}
                           </Group>
                           <Text
                             size="sm"
