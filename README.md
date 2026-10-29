@@ -1,19 +1,43 @@
 # karbyd
 
-Мини-социальная сеть — тренировочный fullstack-проект.
+Мини-социальная сеть — fullstack-проект с real-time чатом, админ-панелью и PWA.
 
 🌐 **Живая версия:** [karbyd.vercel.app](https://karbyd.vercel.app)
 
 ## ✨ Возможности
 
+### 👤 Пользователи
+
 - 🔐 Регистрация и вход (JWT в httpOnly cookie)
-- 📝 Создание и удаление постов с картинками
-- ❤️ Лайки и комментарии
-- 🔗 Кликабельные ссылки в тексте
-- 👤 Профиль с редактированием (bio, аватар)
-- 🔍 Поиск пользователей
-- 📜 Пагинация ленты
-- 🌙 Тёмная тема
+- 👤 Профиль с редактированием (bio, аватар, загрузка файла)
+- 🖼️ Сжатие картинок на клиенте перед загрузкой
+- 🔔 Мгновенные уведомления (WebSocket)
+- 🌗 Светлая и тёмная темы
+- 📱 PWA (устанавливается на телефон)
+- 🔍 Поиск пользователей и постов
+
+### 📝 Контент
+
+- 📝 Создание, редактирование и удаление постов
+- ❤️ Лайки и комментарии (с вложенными ответами)
+- 🔖 Закладки (сохранённые посты)
+- 🔗 Кликабельные ссылки и @упоминания
+- 📸 Загрузка картинок через Supabase Storage
+- 📜 Пагинация с бесконечной прокруткой
+
+### 💬 Социальные связи
+
+- 👥 Подписки (фолловинг)
+- 📰 Лента «Все посты» и «Подписки»
+- 💬 Личные сообщения (с эмодзи и файлами)
+- ⚡ Мгновенный чат и уведомления через WebSocket
+
+### 🛡️ Админ-панель
+
+- 🚫 Бан и разбан пользователей
+- 🗑️ Удаление любых постов и комментариев
+- ❌ Полное удаление пользователей
+- 🔒 Блокировка входа для забаненных
 
 ## 🛠 Стек
 
@@ -25,6 +49,8 @@
 - React Router
 - TanStack Query
 - Axios
+- Browser Image Compression
+- Vite PWA Plugin
 
 **Backend:**
 
@@ -33,12 +59,16 @@
 - PostgreSQL (Supabase)
 - JWT + bcrypt
 - Zod
+- WebSocket (`@fastify/websocket`)
+- Rate Limiting (`@fastify/rate-limit`)
+- Helmet (security headers)
 
 **Деплой:**
 
 - Frontend → Vercel
 - Backend → Railway
 - База данных → Supabase
+- Хранилище файлов → Supabase Storage
 
 ## 🚀 Запуск локально
 
@@ -53,68 +83,3 @@
 git clone https://github.com/Wolosevich/karbyd.git
 cd karbyd
 ```
-
-### 2. Настроить бэкенд
-
-```bash
-cd backend
-npm install
-```
-
-Создать файл `.env` в папке `backend`:
-
-```env
-DATABASE_URL="postgresql://user:password@host:5432/dbname"
-JWT_SECRET="your-secret-key"
-PORT=4000
-CLIENT_URL="http://localhost:5173"
-```
-
-Применить миграции и сгенерировать Prisma Client:
-
-```bash
-npx prisma migrate deploy
-npx prisma generate
-```
-
-Запустить:
-
-```bash
-npm run dev
-```
-
-Бэкенд будет доступен на `http://localhost:4000`.
-
-### 3. Настроить фронтенд
-
-```bash
-cd ../frontend
-npm install
-npm run dev
-```
-
-Фронтенд откроется на `http://localhost:5173`.
-
-## 📁 Структура проекта
-
-```
-karbyd/
-├── backend/
-│   ├── prisma/          # Схема БД и миграции
-│   └── src/
-│       ├── routes/      # API-роуты
-│       ├── plugins/     # JWT-плагин
-│       ├── schemas/     # Zod-схемы
-│       └── lib/         # Prisma Client
-└── frontend/
-    └── src/
-        ├── api/         # HTTP-клиент
-        ├── components/  # UI-компоненты
-        ├── pages/       # Страницы
-        ├── hooks/       # React-хуки
-        └── types/       # TypeScript-типы
-```
-
-## 📄 Лицензия
-
-MIT
