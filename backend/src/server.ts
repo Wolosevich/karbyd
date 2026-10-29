@@ -1,6 +1,7 @@
 import "dotenv/config";
 import Fastify from "fastify";
 import cookie from "@fastify/cookie";
+import helmet from '@fastify/helmet';
 import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
 import authPlugin from "./plugins/auth.js";
@@ -26,6 +27,18 @@ const start = async () => {
     });
 
     await app.register(cookie);
+    await app.register(helmet, {
+      global: true, // Включаем для всех маршрутов
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          imgSrc: ["'self'", 'data:', 'https:'],
+          connectSrc: ["'self'"],
+        },
+      },
+    });
 
     await app.register(multipart, {
       limits: { fileSize: 10 * 1024 * 1024 },
