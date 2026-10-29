@@ -15,6 +15,8 @@ export async function userRoutes(app: FastifyInstance) {
         username: true,
         avatar: true,
         bio: true,
+        role: true,
+        banned: true,
         createdAt: true,
         _count: {
           select: {
@@ -125,13 +127,13 @@ export async function userRoutes(app: FastifyInstance) {
         prisma.follow.count({ where: { followerId: user.id } }),
         currentUserId
           ? prisma.follow.findUnique({
-              where: {
-                followerId_followingId: {
-                  followerId: currentUserId,
-                  followingId: user.id,
-                },
+            where: {
+              followerId_followingId: {
+                followerId: currentUserId,
+                followingId: user.id,
               },
-            })
+            },
+          })
           : null,
       ]);
 

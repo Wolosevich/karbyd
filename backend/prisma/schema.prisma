@@ -13,6 +13,8 @@ model User {
   password  String
   bio       String?
   avatar    String?
+  role      String   @default("user")
+  banned    Boolean  @default(false)
   posts     Post[]
   comments  Comment[]
   likes     Like[]
@@ -124,7 +126,8 @@ model Message {
 
   @@index([senderId, receiverId])
   @@index([receiverId, read])
-}model SavedPost {
+}
+model SavedPost {
   id        String   @id @default(cuid())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String

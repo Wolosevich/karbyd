@@ -9,6 +9,7 @@ import {
   IconUsers,
   IconMessage,
   IconBookmark,
+  IconShieldCheck,
 } from "@tabler/icons-react";
 import { useAuth } from "../hooks/useAuth";
 import { useMantineColorScheme, Tooltip, ActionIcon } from "@mantine/core";
@@ -135,6 +136,16 @@ export default function Navbar() {
             >
               Закладки
             </Menu.Item>
+            {user.role === 'admin' && (
+              <Menu.Item
+                leftSection={<IconShieldCheck size={16} />}
+                color="blue"
+                onClick={() => navigate('/admin')}
+              >
+                Админ-панель
+              </Menu.Item>
+            )}
+
             <Menu.Item
               leftSection={<IconLogout size={16} />}
               color="red"

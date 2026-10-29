@@ -42,7 +42,7 @@ export async function authRoutes(app: FastifyInstance) {
 
       const user = await prisma.user.create({
         data: { email, username, password: hash },
-        select: { id: true, email: true, username: true, createdAt: true },
+        select: { id: true, email: true, username: true, createdAt: true, role: true, banned: true },
       });
 
       const token = app.jwt.sign({ userId: user.id }, { expiresIn: "7d" });
@@ -104,7 +104,7 @@ export async function authRoutes(app: FastifyInstance) {
           maxAge: 60 * 60 * 24 * 7,
         })
         .send({
-          user: { id: user.id, email: user.email, username: user.username },
+          user: { id: user.id, email: user.email, username: user.username, role: user.role, banned: user.banned },
           token,
         });
     },
@@ -133,6 +133,8 @@ export async function authRoutes(app: FastifyInstance) {
         username: true,
         bio: true,
         avatar: true,
+        role: true,
+        banned: true,
         createdAt: true,
       },
     });

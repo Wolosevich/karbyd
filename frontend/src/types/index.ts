@@ -4,6 +4,8 @@ export interface User {
   username: string;
   avatar?: string | null;
   bio?: string | null;
+  role?: string;
+  banned?: boolean;
   createdAt?: string;
   _count?: {
     posts?: number;

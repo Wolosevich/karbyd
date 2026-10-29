@@ -1,4 +1,6 @@
 import "dotenv/config";
+import adminPlugin from './plugins/admin.js';
+import { adminRoutes } from './routes/admin.js';
 import Fastify from "fastify";
 import cookie from "@fastify/cookie";
 import helmet from '@fastify/helmet';
@@ -58,9 +60,13 @@ const start = async () => {
 
     await app.register(authPlugin);
 
+    await app.register(adminPlugin);
+
     await app.register(authRoutes, { prefix: "/api/auth" });
 
     await app.register(wsRoutes, { prefix: "/api" });
+
+    await app.register(adminRoutes, { prefix: '/api/admin' });
 
     await app.register(postRoutes, { prefix: "/api/posts" });
 

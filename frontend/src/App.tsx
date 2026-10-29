@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import Admin from './pages/Admin';
 import {
   Center,
   Loader,
@@ -89,6 +90,7 @@ function App() {
           <Route path="/users" element={<Users />} />
           <Route path="/search" element={<Search />} />
           <Route path="/saved" element={<Saved />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="/post/:id" element={<PostDetail />} />
           <Route path="/profile/:username" element={<Profile />} />
           <Route path="/notifications" element={<Notifications />} />
