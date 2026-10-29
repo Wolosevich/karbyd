@@ -63,14 +63,14 @@ function App() {
 
   // Если ЗАЛОГИНЕН
   return (
-    <AppShell header={{ height: 60 }} padding={{ base: 0, sm: "md" }}>
+    <AppShell header={{ height: 60 }} padding={0}>
       <AppShell.Header
         style={{
           backgroundColor: isDark
             ? "rgba(30, 39, 50, 0.5)"
             : "rgba(255, 255, 255, 0.6)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
+          /* backdropFilter: "blur(12px)",
+           WebkitBackdropFilter: "blur(12px)",*/
           borderBottom: "1px solid var(--mantine-color-default-border)",
         }}
       >
@@ -81,6 +81,7 @@ function App() {
           paddingBottom: "60px",
           background: gradientBg,
           minHeight: "100vh",
+          paddingTop: '60px'
         }}
       >
         <Routes>

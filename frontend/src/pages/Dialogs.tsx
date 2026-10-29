@@ -40,6 +40,7 @@ function DialogSkeleton() {
 export default function Dialogs() {
   const { data, isLoading, isError } = useDialogs();
   const deleteDialog = useDeleteDialog();
+
   if (isLoading) {
     return (
       <Container
@@ -73,11 +74,17 @@ export default function Dialogs() {
   const dialogs = data.items;
 
   return (
-    <Container size="sm" py="xl">
+    <Container
+      size="sm"
+      py={{ base: "sm", sm: "xl" }}
+      px={{ base: "xs", sm: "md" }}
+    >
       <Stack gap="md">
         <Group gap="xs">
-          <IconMessageCircle size={24} />
-          <Title order={2}>Сообщения</Title>
+          <IconMessageCircle size={24} color="var(--mantine-color-text)" />
+          <Title order={2} c="var(--mantine-color-text)">
+            Сообщения
+          </Title>
         </Group>
 
         {dialogs.length === 0 ? (
@@ -124,13 +131,13 @@ export default function Dialogs() {
                     </Badge>
                   )}
 
-                  {/* Кнопка удаления */}
+                  {/* Кнопка удаления (без параметра loading) */}
                   <ActionIcon
                     variant="subtle"
                     color="red"
                     onClick={(e) => {
-                      e.preventDefault(); // Отменяем переход по ссылке
-                      e.stopPropagation(); // Останавливаем всплытие события
+                      e.preventDefault();
+                      e.stopPropagation();
                       if (
                         window.confirm(
                           `Удалить переписку с ${dialog.user.username}?`,
@@ -139,10 +146,6 @@ export default function Dialogs() {
                         deleteDialog.mutate(dialog.user.username);
                       }
                     }}
-                    loading={
-                      deleteDialog.isPending &&
-                      deleteDialog.variables === dialog.user.username
-                    }
                   >
                     <IconTrash size={18} />
                   </ActionIcon>
