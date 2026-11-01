@@ -160,11 +160,11 @@ export default function Chat() {
 
   return (
     <Container
-      fluid
+      size="sm"
       py={0}
-      px={0}
+      px={{ base: 0, sm: "md" }}
       style={{
-        height: "calc(100dvh - 60px)",
+        height: "calc(100dvh - 120px)",
         display: "flex",
         flexDirection: "column",
       }}
