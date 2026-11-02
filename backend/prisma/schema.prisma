@@ -6,6 +6,18 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum Role {
+  user
+  admin
+}
+
+enum NotificationType {
+  like
+  comment
+  follow
+  mention
+}
+
 model User {
   id        String    @id @default(cuid())
   email     String    @unique
@@ -13,7 +25,7 @@ model User {
   password  String
   bio       String?
   avatar    String?
-  role      String   @default("user")
+  role      Role     @default(user)
   banned    Boolean  @default(false)
   posts     Post[]
   comments  Comment[]
@@ -91,7 +103,7 @@ model Notification {
   actorId   String
   
   // Тип: "like", "comment" или "follow"
-  type      String
+  type      NotificationType
   
   // Пост, к которому относится действие (если это лайк или коммент)
   postId    String?
