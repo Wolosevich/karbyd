@@ -72,6 +72,16 @@
 
 ## 🚀 Запуск локально
 
+## 🧪 Тесты
+
+Проект покрыт интеграционными тестами на бэкенде (Vitest + Fastify `inject`).
+
+Запуск тестов:
+
+````bash
+cd backend
+npm test
+
 ### Требования
 
 - Node.js 20+
@@ -82,4 +92,4 @@
 ```bash
 git clone https://github.com/Wolosevich/karbyd.git
 cd karbyd
-```
+````
