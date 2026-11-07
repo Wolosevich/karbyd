@@ -11,6 +11,7 @@ import {
   Center,
   Alert,
   ActionIcon,
+  Drawer,
   Textarea,
   Box,
   Title,
@@ -18,6 +19,7 @@ import {
   FileButton,
   useMantineColorScheme,
 } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import {
   IconInfoCircle,
   IconArrowLeft,
@@ -77,6 +79,7 @@ export default function Chat() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const { colorScheme } = useMantineColorScheme();
+  const isMobile = useMediaQuery("(max-width: 48em)");
   const isDark = colorScheme === "dark";
 
   // --- WEBSOCKET ---
@@ -365,30 +368,70 @@ export default function Chat() {
             }}
           >
             <Group gap="xs" wrap="nowrap">
-              <Popover
-                opened={emojiPickerOpen}
-                onChange={setEmojiPickerOpen}
-                position="top-start"
-                shadow="md"
+              {/* Кнопка открытия эмодзи */}
+              <ActionIcon
+                variant="subtle"
+                size="lg"
+                onClick={() => setEmojiPickerOpen((o) => !o)}
               >
-                <Popover.Target>
-                  <ActionIcon
-                    variant="subtle"
-                    size="lg"
-                    onClick={() => setEmojiPickerOpen((o) => !o)}
-                  >
-                    <IconMoodSmile size={20} />
-                  </ActionIcon>
-                </Popover.Target>
-                <Popover.Dropdown p={0}>
+                <IconMoodSmile size={20} />
+              </ActionIcon>
+
+              {/* Для ПК: Popover */}
+              {!isMobile && (
+                <Popover
+                  opened={emojiPickerOpen}
+                  onChange={setEmojiPickerOpen}
+                  position="top-start"
+                  offset={8}
+                  shadow="md"
+                >
+                  <Popover.Target>
+                    <div style={{ display: "none" }} />
+                  </Popover.Target>
+                  <Popover.Dropdown p={0}>
+                    <EmojiPicker
+                      onEmojiClick={(emojiData) => {
+                        setText((prev) => prev + emojiData.emoji);
+                        setEmojiPickerOpen(false);
+                      }}
+                      width={350}
+                      height={450}
+                      theme={isDark ? "dark" : "light"}
+                    />
+                  </Popover.Dropdown>
+                </Popover>
+              )}
+
+              {/* Для мобилок: Drawer (шторка снизу) */}
+              {isMobile && (
+                <Drawer
+                  opened={emojiPickerOpen}
+                  onClose={() => setEmojiPickerOpen(false)}
+                  position="bottom"
+                  size={420}
+                  title="Выберите эмодзи"
+                  padding="md"
+                  styles={{
+                    content: {
+                      backgroundColor: isDark
+                        ? "var(--mantine-color-dark-7)"
+                        : "var(--mantine-color-white)",
+                    },
+                    body: { padding: 8 },
+                  }}
+                >
                   <EmojiPicker
                     onEmojiClick={(emojiData) => {
                       setText((prev) => prev + emojiData.emoji);
                       setEmojiPickerOpen(false);
                     }}
+                    width="100%"
+                    height={350}
+                    theme={isDark ? "dark" : "light"}
                   />
-                </Popover.Dropdown>
-              </Popover>
+                </Drawer>
+              )}
 
               <FileButton onChange={handleFileSelect}>
                 {(props) => (

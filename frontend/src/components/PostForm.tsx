@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useMediaQuery } from "@mantine/hooks";
 import {
   Textarea,
   Button,
@@ -8,8 +9,10 @@ import {
   Image,
   FileButton,
   ActionIcon,
+  useMantineColorScheme,
   Loader,
   Popover,
+  Drawer,
 } from "@mantine/core";
 import { IconPhoto, IconX, IconMoodSmile } from "@tabler/icons-react";
 import { useForm } from "@mantine/form";
@@ -22,7 +25,9 @@ export default function PostForm() {
   const createPost = useCreatePost();
   const { uploadImage, isUploading } = useUpload();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-
+  const isMobile = useMediaQuery("(max-width: 48em)");
+  const { colorScheme } = useMantineColorScheme();
+  const isDark = colorScheme === "dark";
   // Состояние для открытия панели эмодзи
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
 
@@ -98,35 +103,78 @@ export default function PostForm() {
 
         <Group justify="space-between" mt="sm">
           <Group gap="xs">
-            {/* Пикер эмодзи для поста */}
-            <Popover
-              opened={emojiPickerOpen}
-              onChange={setEmojiPickerOpen}
-              position="top-start"
-              shadow="md"
+            {/* Кнопка открытия эмодзи */}
+            <ActionIcon
+              variant="subtle"
+              size="lg"
+              onClick={() => setEmojiPickerOpen((o) => !o)}
             >
-              <Popover.Target>
-                <ActionIcon
-                  variant="subtle"
-                  size="lg"
-                  onClick={() => setEmojiPickerOpen((o) => !o)}
-                >
-                  <IconMoodSmile size={20} />
-                </ActionIcon>
-              </Popover.Target>
-              <Popover.Dropdown p={0}>
+              <IconMoodSmile size={20} />
+            </ActionIcon>
+
+            {/* Для ПК: Popover */}
+            {!isMobile && (
+              <Popover
+                opened={emojiPickerOpen}
+                onChange={setEmojiPickerOpen}
+                position="top-start"
+                offset={8}
+                shadow="md"
+              >
+                <Popover.Target>
+                  <div style={{ display: "none" }} />
+                </Popover.Target>
+                <Popover.Dropdown p={0}>
+                  <EmojiPicker
+                    onEmojiClick={(emojiData) => {
+                      form.setFieldValue(
+                        "text",
+                        form.values.text + emojiData.emoji,
+                      );
+                      setEmojiPickerOpen(false);
+                    }}
+                    width={350}
+                    height={450}
+                    theme={isDark ? "dark" : "light"}
+                  />
+                </Popover.Dropdown>
+              </Popover>
+            )}
+
+            {/* Для мобилок: Drawer (шторка снизу) */}
+            {isMobile && (
+              <Drawer
+                opened={emojiPickerOpen}
+                onClose={() => setEmojiPickerOpen(false)}
+                position="bottom"
+                size={isMobile ? 420 : "md"}
+                title="Выберите эмодзи"
+                padding="md"
+                styles={{
+                  content: {
+                    backgroundColor: isDark
+                      ? "var(--mantine-color-dark-7)"
+                      : "var(--mantine-color-white)",
+                  },
+                  body: {
+                    padding: 8,
+                  },
+                }}
+              >
                 <EmojiPicker
                   onEmojiClick={(emojiData) => {
-                    // Добавляем эмодзи в конец текста формы
                     form.setFieldValue(
                       "text",
                       form.values.text + emojiData.emoji,
                     );
                     setEmojiPickerOpen(false);
                   }}
+                  width="100%"
+                  height={350}
+                  theme={isDark ? "dark" : "light"}
                 />
-              </Popover.Dropdown>
-            </Popover>
+              </Drawer>
+            )}
 
             <FileButton
               onChange={handleFileSelect}
