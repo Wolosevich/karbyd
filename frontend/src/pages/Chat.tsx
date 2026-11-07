@@ -15,7 +15,6 @@ import {
   Textarea,
   Box,
   Title,
-  Popover,
   FileButton,
   useMantineColorScheme,
 } from "@mantine/core";
@@ -359,6 +358,7 @@ export default function Chat() {
           </Box>
 
           {/* Поле ввода */}
+          {/* Поле ввода */}
           <Box
             p="sm"
             style={{
@@ -367,70 +367,66 @@ export default function Chat() {
                 : "1px solid #e0e0e0",
             }}
           >
-            <Group gap="xs" wrap="nowrap">
-              {/* Кнопка открытия эмодзи */}
-              <ActionIcon
-                variant="subtle"
-                size="lg"
-                onClick={() => setEmojiPickerOpen((o) => !o)}
-              >
-                <IconMoodSmile size={20} />
-              </ActionIcon>
+            {/* Десктоп: инлайновый пикер на всю ширину */}
+            {!isMobile && emojiPickerOpen && (
+              <Box mb="sm" style={{ borderRadius: 8, overflow: "hidden" }}>
+                <EmojiPicker
+                  onEmojiClick={(emojiData) => {
+                    setText((prev) => prev + emojiData.emoji);
+                    setEmojiPickerOpen(false);
+                  }}
+                  width="100%"
+                  height={350}
+                  theme={isDark ? "dark" : "light"}
+                />
+              </Box>
+            )}
 
-              {/* Для ПК: Popover */}
-              {!isMobile && (
-                <Popover
-                  opened={emojiPickerOpen}
-                  onChange={setEmojiPickerOpen}
-                  position="top-start"
-                  offset={8}
-                  shadow="md"
-                >
-                  <Popover.Target>
-                    <div style={{ display: "none" }} />
-                  </Popover.Target>
-                  <Popover.Dropdown p={0}>
+            <Group gap="xs" wrap="nowrap">
+              {isMobile ? (
+                <>
+                  <ActionIcon
+                    variant="subtle"
+                    size="lg"
+                    onClick={() => setEmojiPickerOpen(true)}
+                  >
+                    <IconMoodSmile size={20} />
+                  </ActionIcon>
+                  <Drawer
+                    opened={emojiPickerOpen}
+                    onClose={() => setEmojiPickerOpen(false)}
+                    position="bottom"
+                    size={420}
+                    title="Выберите эмодзи"
+                    padding="md"
+                    styles={{
+                      content: {
+                        backgroundColor: isDark
+                          ? "var(--mantine-color-dark-7)"
+                          : "var(--mantine-color-white)",
+                      },
+                      body: { padding: 8 },
+                    }}
+                  >
                     <EmojiPicker
                       onEmojiClick={(emojiData) => {
                         setText((prev) => prev + emojiData.emoji);
                         setEmojiPickerOpen(false);
                       }}
-                      width={350}
-                      height={450}
+                      width="100%"
+                      height={350}
                       theme={isDark ? "dark" : "light"}
                     />
-                  </Popover.Dropdown>
-                </Popover>
-              )}
-
-              {/* Для мобилок: Drawer (шторка снизу) */}
-              {isMobile && (
-                <Drawer
-                  opened={emojiPickerOpen}
-                  onClose={() => setEmojiPickerOpen(false)}
-                  position="bottom"
-                  size={420}
-                  title="Выберите эмодзи"
-                  padding="md"
-                  styles={{
-                    content: {
-                      backgroundColor: isDark
-                        ? "var(--mantine-color-dark-7)"
-                        : "var(--mantine-color-white)",
-                    },
-                    body: { padding: 8 },
-                  }}
+                  </Drawer>
+                </>
+              ) : (
+                <ActionIcon
+                  variant="subtle"
+                  size="lg"
+                  onClick={() => setEmojiPickerOpen((o) => !o)}
                 >
-                  <EmojiPicker
-                    onEmojiClick={(emojiData) => {
-                      setText((prev) => prev + emojiData.emoji);
-                      setEmojiPickerOpen(false);
-                    }}
-                    width="100%"
-                    height={350}
-                    theme={isDark ? "dark" : "light"}
-                  />
-                </Drawer>
+                  <IconMoodSmile size={20} />
+                </ActionIcon>
               )}
 
               <FileButton onChange={handleFileSelect}>

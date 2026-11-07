@@ -1,17 +1,16 @@
 import { useState } from "react";
+import { useMediaQuery } from "@mantine/hooks";
 import {
   Textarea,
   Button,
   Group,
-  Drawer,
   ActionIcon,
-  Popover,
+  Drawer,
+  useMantineColorScheme,
 } from "@mantine/core";
 import { IconMoodSmile } from "@tabler/icons-react";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { useMediaQuery } from "@mantine/hooks";
-import { useMantineColorScheme } from "@mantine/core";
 import EmojiPicker from "emoji-picker-react";
 import { useAddComment } from "../hooks/usePosts";
 
@@ -70,29 +69,48 @@ export default function CommentForm({
         maxRows={4}
         {...form.getInputProps("text")}
       />
-      <Group justify="space-between" mt="xs">
-        {/* Пикер эмодзи для комментария */}
-        {/* Кнопка открытия эмодзи */}
-        <ActionIcon
-          variant="subtle"
-          onClick={() => setEmojiPickerOpen((o) => !o)}
-        >
-          <IconMoodSmile size={18} />
-        </ActionIcon>
 
-        {/* Для ПК: Popover */}
-        {!isMobile && (
-          <Popover
-            opened={emojiPickerOpen}
-            onChange={setEmojiPickerOpen}
-            position="top-start"
-            offset={8}
-            shadow="md"
-          >
-            <Popover.Target>
-              <div style={{ display: "none" }} />
-            </Popover.Target>
-            <Popover.Dropdown p={0}>
+      {/* Инлайновый пикер эмодзи на десктопе */}
+      {!isMobile && emojiPickerOpen && (
+        <div style={{ borderRadius: 8, overflow: "hidden", marginTop: 12 }}>
+          <EmojiPicker
+            onEmojiClick={(emojiData) => {
+              form.setFieldValue("text", form.values.text + emojiData.emoji);
+              setEmojiPickerOpen(false);
+            }}
+            width="100%"
+            height={350}
+            theme={isDark ? "dark" : "light"}
+          />
+        </div>
+      )}
+
+      <Group justify="space-between" mt="xs">
+        {/* Кнопка-смайлик */}
+        {isMobile ? (
+          <>
+            <ActionIcon
+              variant="subtle"
+              onClick={() => setEmojiPickerOpen(true)}
+            >
+              <IconMoodSmile size={18} />
+            </ActionIcon>
+            <Drawer
+              opened={emojiPickerOpen}
+              onClose={() => setEmojiPickerOpen(false)}
+              position="bottom"
+              size={420}
+              title="Выберите эмодзи"
+              padding="md"
+              styles={{
+                content: {
+                  backgroundColor: isDark
+                    ? "var(--mantine-color-dark-7)"
+                    : "var(--mantine-color-white)",
+                },
+                body: { padding: 8 },
+              }}
+            >
               <EmojiPicker
                 onEmojiClick={(emojiData) => {
                   form.setFieldValue(
@@ -101,45 +119,22 @@ export default function CommentForm({
                   );
                   setEmojiPickerOpen(false);
                 }}
-                width={350}
-                height={450}
+                width="100%"
+                height={350}
                 theme={isDark ? "dark" : "light"}
               />
-            </Popover.Dropdown>
-          </Popover>
-        )}
-
-        {/* Для мобилок: Drawer */}
-        {isMobile && (
-          <Drawer
-            opened={emojiPickerOpen}
-            onClose={() => setEmojiPickerOpen(false)}
-            position="bottom"
-            size={420}
-            title="Выберите эмодзи"
-            padding="md"
-            styles={{
-              content: {
-                backgroundColor: isDark
-                  ? "var(--mantine-color-dark-7)"
-                  : "var(--mantine-color-white)",
-              },
-              body: { padding: 8 },
-            }}
+            </Drawer>
+          </>
+        ) : (
+          <ActionIcon
+            variant="subtle"
+            onClick={() => setEmojiPickerOpen((o) => !o)}
           >
-            <EmojiPicker
-              onEmojiClick={(emojiData) => {
-                form.setFieldValue("text", form.values.text + emojiData.emoji);
-                setEmojiPickerOpen(false);
-              }}
-              width="100%"
-              height={350}
-              theme={isDark ? "dark" : "light"}
-            />
-          </Drawer>
+            <IconMoodSmile size={18} />
+          </ActionIcon>
         )}
 
-        {/* Кнопки */}
+        {/* Кнопки отправки */}
         <Group gap="xs">
           {onCancel && (
             <Button variant="default" size="xs" onClick={onCancel}>
